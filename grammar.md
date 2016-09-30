@@ -22,4 +22,29 @@ case
 switch
 else
 elif
+listen
+```
+
+## Rules
+
+```
+program => : program 
+           | statement
+program => END_PROG
+
+statement =>  : statements 
+              | print expression
+              | get string function
+              | post string function
+              | read variable
+              | if expressions { statements } ELSEIF
+              | if expressions { statements } 
+              | for expressions { statements }
+              | import string
+ELSIF => : 0
+         | elif expressions { statements }
+         | else { statements }
+statements => : statements
+              | statement
+   
 ```
