@@ -1,0 +1,8 @@
+sudo: false
+
+go_import_path: github.com/PMoneda/hub
+
+language: go
+
+go:
+- 1.7.1
