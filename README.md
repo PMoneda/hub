@@ -1,3 +1,7 @@
+[![GoDoc](https://godoc.org/github.com/PMoneda/hub?status.svg)](https://godoc.org/github.com/PMoneda/hub)
+[![Go Report Card](https://goreportcard.com/badge/github.com/PMoneda/hub)](https://goreportcard.com/report/github.com/PMoneda/hub)
+[![Build Status](https://travis-ci.org/PMoneda/hub.svg?branch=master)](https://travis-ci.org/PMoneda/hub)
+
 # hub
 
 Hub is a programming language written in Go
