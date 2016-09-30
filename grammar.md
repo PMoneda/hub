@@ -47,6 +47,7 @@ statement =>  : statements
               | type ID { IDS }
               | var ID = expressions
               | const ID = expressions
+              | defun ID (args) { statements }
 
 
 expressions => : expressions
@@ -55,6 +56,12 @@ expressions => : expressions
 
 expression => : ID
               | ID OP expressions
+
+args => : 0
+        | arg
+
+arg  => : args
+        | IDS
 
 OP => : +
       | -
