@@ -15,7 +15,6 @@ func TestLexer(t *testing.T) {
 	lexer.Parse(func(tokens []string) {
 		for i := 0; i < len(tokens); i++ {
 			fmt.Print(string(tokens[i]))
-			fmt.Print("   ")
 		}
 		fmt.Println()
 	})
