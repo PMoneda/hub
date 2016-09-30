@@ -3,7 +3,7 @@ var a = 1 #comment2
 var b = 2
 var c = a + b
 var hello = "world"
-var hello = "hello" + "world"
+var hello = "hello"+"world"
 var hel = "hello world"
 print c
 

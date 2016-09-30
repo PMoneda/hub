@@ -6,12 +6,12 @@ import (
 )
 
 const (
-	test1 = "./test/test1.hub"
+	tokenize = "./test/tokenize.hub"
 )
 
 func TestLexer(t *testing.T) {
 	var lexer Lexer
-	lexer.fileName = test1
+	lexer.fileName = tokenize
 	lexer.Parse(func(tokens []string) {
 		for i := 0; i < len(tokens); i++ {
 			fmt.Print(string(tokens[i]))
