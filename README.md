@@ -29,6 +29,9 @@ defun odd(n){
 ```
 
 # Example declaring var
+```
+var car = "Car"
+```
 
 # Example 1  support http handlers
 ```
