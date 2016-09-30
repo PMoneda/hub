@@ -1,0 +1,11 @@
+#comment
+var a = 1 #comment 2
+var b = 2
+var c = a + b
+var hello = "world"
+var hel = "hello world"
+print c
+var sm = "Hello" + "World"
+for a = 1; a < 10; a++ {
+    print a
+}
