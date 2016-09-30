@@ -23,6 +23,9 @@ switch
 else
 elif
 listen
+nand
+nor
+xor
 ```
 
 ## Rules
@@ -38,13 +41,44 @@ statement =>  : statements
               | post string function
               | read variable
               | if expressions { statements } ELSEIF
-              | if expressions { statements } 
               | for expressions { statements }
               | import string
+              | listen number ( statements )
+              | type ID { IDS }
+              | var ID = expressions
+              | const ID = expressions
+
+
+expressions => : expressions
+               | expression
+               | (expression)
+
+expression => : ID
+              | ID OP expressions
+
+OP => : +
+      | -
+      | *
+      | /
+      | mod
+      | and
+      | or
+      | not
+      | nand
+      | nor
+      | xor
 ELSIF => : 0
          | elif expressions { statements }
          | else { statements }
-statements => : statements
+
+ID  => : name
+
+IDS => : IDS,
+       | ID
+number => integer
+
+statements => : 0
+              | statements
               | statement
    
 ```
