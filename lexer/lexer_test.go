@@ -10,8 +10,7 @@ const (
 )
 
 func TestLexer(t *testing.T) {
-	var lexer Lexer
-	lexer.fileName = tokenize
+	lexer := Lexer{fileName: tokenize}
 	lexer.Parse(func(tokens []string) {
 		for i := 0; i < len(tokens); i++ {
 			fmt.Print(string(tokens[i]))
