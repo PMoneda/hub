@@ -21,7 +21,7 @@ for i = 0, i < 1000, i++ {
 
 ```
 defun odd(n){
-  if n mod 2 {
+  if n mod 2 == 0 {
     return false
   }
   return true
@@ -61,6 +61,3 @@ listen 8080 (
 )
 ```
 
-
-
-# Example 2
