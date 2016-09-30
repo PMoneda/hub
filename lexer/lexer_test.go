@@ -12,11 +12,13 @@ const (
 func TestLexer(t *testing.T) {
 	var lexer Lexer
 	lexer.fileName = test1
-	for lexer.HasNext() {
-		lexer.Tokenize(lexer.NextLine())
+	lexer.Parse(func(tokens []string) {
+		for i := 0; i < len(tokens); i++ {
+			fmt.Print(string(tokens[i]))
+			fmt.Print("   ")
+		}
 		fmt.Println()
-	}
-
+	})
 }
 
 func BenchmarkLexer(b *testing.B) {
