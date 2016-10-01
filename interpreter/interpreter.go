@@ -1,66 +1,91 @@
 //Package interpreter execute hub commands
 package interpreter
 
-import "github.com/PMoneda/hub/lexer"
+import (
+	"errors"
+
+	"github.com/PMoneda/hub/lexer"
+)
 
 //Interpreter instance to run hub code
 type Interpreter struct {
-	lexer *lexer.Lexer
+	lexer          *lexer.Lexer
+	executionState int
 }
 
-//Program is the initial point of execution and starts with de first token on hub script
-func (interpreter *Interpreter) Program(token string) {
-
+//Run execute a hub script
+func (interpreter *Interpreter) Run(lexer *lexer.Lexer) {
+	interpreter.lexer = lexer
+	interpreter.stmt()
 }
 
-//Statement rule for list of commands
-func (interpreter *Interpreter) Statement(token string) {
+func (interpreter *Interpreter) getNextToken() string {
+	if interpreter.lexer.HasNext() {
+		return interpreter.lexer.Next()
+	}
+	return "\\EOF\\"
+}
+
+//exec is the initial point of execution and starts with de first token on hub script
+func (interpreter *Interpreter) stmt() {
+	token := interpreter.getNextToken()
 	switch token {
 	case "var":
-		//Execute var statement
+		interpreter.varStmt()
 		return
 	}
 }
 
-func isVar(token string) bool {
-	return token == "var"
+func (interpreter *Interpreter) matchKeyword(keyword string) error {
+	next := interpreter.getNextToken()
+	err := interpreter.matchEOF(next)
+	if err == nil {
+		if next != keyword {
+			err := errors.New("Expected: " + keyword + " got: " + next + " line: " + string(interpreter.lexer.GetCurrentLine()))
+			return err
+		}
+		return nil //OK
+	}
+	return err
 }
-func isIF(token string) bool {
-	return token == "if"
+
+func (interpreter *Interpreter) matchIdent() error {
+	next := interpreter.getNextToken()
+	err := interpreter.matchEOF(next)
+	if err == nil {
+		if !interpreter.lexer.IsIdent(next) {
+			err := errors.New("Expected Identifier  got: " + next + " line: " + string(interpreter.lexer.GetCurrentLine()))
+			return err
+		}
+		return nil //OK
+	}
+	return err
 }
-func isElif(token string) bool {
-	return token == "elif"
+func (interpreter *Interpreter) matchEOF(token string) error {
+	if token == "\\EOF\\" {
+		err := errors.New("Unexpected end of file line: " + string(interpreter.lexer.GetCurrentLine()))
+		return err
+	}
+	return nil
 }
-func isElse(token string) bool {
-	return token == "else"
+
+//Statement rule for list of commands
+func (interpreter *Interpreter) varStmt() {
+	//ID = EXP
+	err := interpreter.matchIdent()
+	if err != nil {
+		panic(err.Error())
+	}
+	err1 := interpreter.matchKeyword("=")
+	if err1 != nil {
+		panic(err1.Error())
+	}
+	err2 := interpreter.expressions()
+	if err2 != nil {
+		panic(err2.Error())
+	}
 }
-func isReturn(token string) bool {
-	return token == "return"
-}
-func isDataSource(token string) bool {
-	return token == "datasource"
-}
-func isGet(token string) bool {
-	return token == "get"
-}
-func isPost(token string) bool {
-	return token == "post"
-}
-func isImport(token string) bool {
-	return token == "import"
-}
-func isAnd(token string) bool {
-	return token == "and"
-}
-func isOr(token string) bool {
-	return token == "or"
-}
-func isNot(token string) bool {
-	return token == "not"
-}
-func isListen(token string) bool {
-	return token == "listen"
-}
-func isDefun(token string) bool {
-	return token == "defun"
+
+func (interpreter *Interpreter) expressions() error {
+	return errors.New("Not Implemented")
 }

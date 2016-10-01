@@ -11,12 +11,9 @@ const (
 
 func TestLexer(t *testing.T) {
 	lexer := Lexer{fileName: tokenize}
-	lexer.Parse(func(tokens []string) {
-		for i := 0; i < len(tokens); i++ {
-			fmt.Print(string(tokens[i]))
-		}
-		fmt.Println()
-	})
+	for lexer.HasNext() {
+		fmt.Print(lexer.Next() + " ")
+	}
 }
 
 func BenchmarkLexer(b *testing.B) {
