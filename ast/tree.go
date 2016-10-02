@@ -8,14 +8,14 @@ type Tree struct {
 
 //DeepWalk inside Tree
 func (tree *Tree) DeepWalk(callback func(interface{})) {
-	callback(tree.Value)
 	if tree.Children != nil {
 		for i := 0; i < len(tree.Children); i++ {
 			node := tree.Children[i]
 			node.DeepWalk(callback)
+
 		}
 	}
-
+	callback(tree.Value)
 }
 
 //AppendChild to existing Tree

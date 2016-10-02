@@ -12,7 +12,7 @@ func TestTree(t *testing.T) {
 	root.AppendChild(chd1)
 	root.AppendChild(chd2)
 	root.AppendChild(chd3)
-	output := [...]int{1, 11, 111, 12, 13}
+	output := [...]int{111, 11, 12, 13, 1}
 	count := 0
 	root.DeepWalk(func(v interface{}) {
 		if output[count] != v.(int) {

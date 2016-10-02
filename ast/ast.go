@@ -1,30 +1,48 @@
 //Package ast contains the Abstract Syntax Tree Implementation
 package ast
 
+import "fmt"
+
 //Node is the basic interface for AST
 type Node interface {
-	TokenList() []string
+	Print()
 }
 
 //Expr is a Expresion Node
-type Expr interface {
-	Node
-	exprNode()
+type Expr struct {
 }
 
-//Stmt is a Expresion Node
-type Stmt interface {
-	Node
-	stmtNode()
+//Ident is a Identification
+type Ident struct {
+	Name string
 }
 
-//Decl is a Expresion Node
-type Decl interface {
-	Node
-	declNode()
+//RootNode data strucutre for declarations
+type RootNode struct {
+	Program string
 }
 
-////////////////////////////////////////////////////////////////////////////////
-//Declare fiedls
+//DeclVar data strucutre for declarations
+type DeclVar struct {
+	Op string
+}
 
-////////////////////////////////////////////////////////////////////////////////
+//Print prints AST node
+func (dec DeclVar) Print() {
+	fmt.Println(dec.Op)
+}
+
+//Print prints AST node
+func (ident Ident) Print() {
+	fmt.Println("Name: " + ident.Name)
+}
+
+//Print prints AST node
+func (dec Expr) Print() {
+	fmt.Println("Ola Mundo")
+}
+
+//Print root
+func (root RootNode) Print() {
+	fmt.Println("Start")
+}

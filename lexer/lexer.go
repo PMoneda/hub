@@ -5,6 +5,7 @@ import (
 	"bufio"
 	"bytes"
 	"os"
+	"unicode"
 	"unicode/utf8"
 )
 
@@ -12,11 +13,12 @@ import (
 type Lexer struct {
 	file         *os.File
 	offset       int
-	fileName     string
+	FileName     string
 	scanner      *bufio.Scanner
 	currentLine  int
 	tokenBuffer  []string
 	currentToken int
+	line         string
 }
 
 //GetCurrentLine gets current lexer linenumber
@@ -24,31 +26,54 @@ func (lexer *Lexer) GetCurrentLine() int {
 	return lexer.currentLine
 }
 
+//GetLine get current line
+func (lexer *Lexer) GetLine() string {
+	return lexer.line
+}
+
+//GetCurrentToken returns index of current token
+func (lexer *Lexer) GetCurrentToken() int {
+	return lexer.currentToken
+}
+
 //NextLine of code
 func (lexer *Lexer) NextLine() string {
-	if lexer.file == nil {
-		lexer.openFile()
-	}
+	text := lexer.scanner.Text()
 	lexer.currentLine++
-	return lexer.scanner.Text()
+	lexer.line = text
+	return text
 }
 
 //Next return the next token
 func (lexer *Lexer) Next() string {
-	if lexer.currentToken >= len(lexer.tokenBuffer) {
-		if lexer.HasNext() {
-			line := lexer.NextLine()
-			lexer.currentToken = 0
-			lexer.tokenBuffer = lexer.Tokenize(line)
+	if len(lexer.tokenBuffer) > lexer.currentToken {
+		token := lexer.tokenBuffer[lexer.currentToken]
+		lexer.currentToken++
+		return token
+	} else if lexer.HasNext() {
+		line := lexer.NextLine()
+		tokens := lexer.Tokenize(line)
+		for len(tokens) == 0 && lexer.HasNext() {
+			line = lexer.NextLine()
+			tokens = lexer.Tokenize(line)
 		}
+		if !lexer.HasNext() {
+			return "\\EOF\\"
+		}
+		lexer.currentToken = 1
+		lexer.tokenBuffer = lexer.Tokenize(line)
+
+		return lexer.tokenBuffer[0]
 	}
-	token := lexer.tokenBuffer[lexer.currentToken]
-	lexer.currentToken++
-	return token
+
+	return "\\EOF\\"
 }
 
 func (lexer *Lexer) openFile() {
-	f, _ := os.Open(lexer.fileName)
+	f, err := os.Open(lexer.FileName)
+	if err != nil {
+		panic(err.Error())
+	}
 	lexer.file = f
 	scanner := bufio.NewScanner(f)
 	scanner.Split(bufio.ScanLines)
@@ -59,16 +84,26 @@ func (lexer *Lexer) openFile() {
 func (lexer *Lexer) HasNext() bool {
 	if lexer.scanner == nil {
 		lexer.openFile()
+		lexer.currentToken = 0
+		line := lexer.NextLine()
+		lexer.tokenBuffer = lexer.Tokenize(line)
+		return true
 	}
 	if lexer.currentToken < len(lexer.tokenBuffer) {
 		return true
 	}
-	return lexer.scanner.Scan()
+	hasNext := lexer.scanner.Scan()
+	if hasNext {
+		lexer.currentToken = 0
+		line := lexer.NextLine()
+		lexer.tokenBuffer = lexer.Tokenize(line)
+	}
+	return hasNext
 }
 
 //Tokenize line command
 func (lexer *Lexer) Tokenize(line string) []string {
-	tokens := make([]string, 1)
+	var tokens []string
 	var buffer bytes.Buffer
 	for i := 0; i < len(line); i++ {
 		if isComment(line[i]) {
@@ -157,44 +192,61 @@ func isIdent(c byte) bool {
 	return 'A' <= c && c <= 'Z' || 'a' <= c && c <= 'z' || '0' <= c && c <= '9' || c == '_' || c >= utf8.RuneSelf
 }
 
+//IsIdent returns if token is a identificator
 func (lexer *Lexer) IsIdent(token string) bool {
-	return !lexer.IsDelimiter(token) && !lexer.IsOperator(token) && !lexer.IsKeyword(token)
+	isDel := lexer.IsDelimiter(token)
+	isOp := lexer.IsOperator(token)
+	isKeyword := lexer.IsKeyword(token)
+	isStr := lexer.IsString(token)
+	isNum := lexer.IsNumber(token)
+	return !isDel && !isOp && !isKeyword && !isStr && !isNum
+}
+
+//IsString returns if token is a string
+func (lexer *Lexer) IsString(token string) bool {
+	return byte(token[0]) == '"' && byte(token[len(token)-1]) == '"'
+}
+
+//IsNumber returns if token is a string
+func (lexer *Lexer) IsNumber(token string) bool {
+	r, _ := utf8.DecodeRuneInString(token)
+	return unicode.IsNumber(r)
 }
 
 //IsKeyword returns true if token is reserved word
 func (lexer *Lexer) IsKeyword(token string) bool {
 	switch token {
 	case "var":
-		return false
+		return true
 	case "const":
-		return false
+		return true
 	case "if":
-		return false
+		return true
 	case "for":
-		return false
+		return true
 	case "elif":
-		return false
+		return true
 	case "else":
-		return false
+		return true
 	case "and":
-		return false
+		return true
 	case "or":
-		return false
+		return true
 	case "not":
-		return false
+		return true
 	case "mod":
-		return false
+		return true
 	case "defun":
-		return false
+		return true
 	case "listen":
-		return false
+		return true
 	case "get":
-		return false
+		return true
 	case "post":
-		return false
+		return true
 
 	}
-	return true
+	return false
 }
 
 //IsAssingOp return true if operator is =
