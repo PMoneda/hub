@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"github.com/PMoneda/hub/ast"
+	"github.com/PMoneda/hub/lang"
 	"github.com/PMoneda/hub/lexer"
 )
 
@@ -36,7 +37,19 @@ func (interpreter *Interpreter) Run(lexer *lexer.Lexer) {
 //Print ast
 func (interpreter *Interpreter) Print() {
 	interpreter.root.DeepWalk(func(value interface{}) {
-		fmt.Println(value)
+		v1 := value.(lang.Object)
+		v1.ToString()
+		switch v := value.(type) {
+		case string:
+			fmt.Println(v)
+		case int32, int64:
+			fmt.Println(v)
+		case lang.Object:
+			fmt.Println(v.ToString())
+		default:
+			panic(v)
+		}
+
 	})
 }
 
@@ -108,13 +121,18 @@ func (interpreter *Interpreter) identStmt(parent *ast.Tree) {
 	if err != nil {
 		panic(err.Error())
 	}
-	var ident = ast.Ident{Name: id}
+	var ident = lang.BuildPointer(id)
 	parent.Value = ident
 
 }
 
 func (interpreter *Interpreter) exprStmt(root *ast.Tree) {
 	token := interpreter.lexer.Next()
-	root.Value = token
+	lex := interpreter.lexer
+	if lex.IsString(token) {
+		root.Value = lang.BuildString(token)
+	} else if lex.IsNumber(token) {
+		root.Value = lang.BuildNumber(token)
+	}
 
 }

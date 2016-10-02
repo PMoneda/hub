@@ -30,3 +30,8 @@ func (str *String) Equals(obj Object) bool {
 	}
 	return false
 }
+
+//ToString return a string representation about String instance
+func (str *String) ToString() string {
+	return str.value
+}
