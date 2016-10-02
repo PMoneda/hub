@@ -189,7 +189,7 @@ func (lexer *Lexer) IsDelimiter(c string) bool {
 }
 
 func isIdent(c byte) bool {
-	return 'A' <= c && c <= 'Z' || 'a' <= c && c <= 'z' || '0' <= c && c <= '9' || c == '_' || c >= utf8.RuneSelf
+	return c == '.' || 'A' <= c && c <= 'Z' || 'a' <= c && c <= 'z' || '0' <= c && c <= '9' || c == '_' || c >= utf8.RuneSelf
 }
 
 //IsIdent returns if token is a identificator
@@ -199,12 +199,18 @@ func (lexer *Lexer) IsIdent(token string) bool {
 	isKeyword := lexer.IsKeyword(token)
 	isStr := lexer.IsString(token)
 	isNum := lexer.IsNumber(token)
-	return !isDel && !isOp && !isKeyword && !isStr && !isNum
+	isBool := lexer.IsBoolean(token)
+	return !isDel && !isOp && !isKeyword && !isStr && !isNum && !isBool
 }
 
 //IsString returns if token is a string
 func (lexer *Lexer) IsString(token string) bool {
 	return byte(token[0]) == '"' && byte(token[len(token)-1]) == '"'
+}
+
+//IsBoolean returns if token is a boolean
+func (lexer *Lexer) IsBoolean(token string) bool {
+	return token == "true" || token == "false"
 }
 
 //IsNumber returns if token is a string

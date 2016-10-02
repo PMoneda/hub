@@ -37,17 +37,12 @@ func (interpreter *Interpreter) Run(lexer *lexer.Lexer) {
 //Print ast
 func (interpreter *Interpreter) Print() {
 	interpreter.root.DeepWalk(func(value interface{}) {
-		v1 := value.(lang.Object)
-		v1.ToString()
 		switch v := value.(type) {
-		case string:
-			fmt.Println(v)
-		case int32, int64:
-			fmt.Println(v)
 		case lang.Object:
 			fmt.Println(v.ToString())
+			break
 		default:
-			panic(v)
+			fmt.Println(v)
 		}
 
 	})
@@ -133,6 +128,10 @@ func (interpreter *Interpreter) exprStmt(root *ast.Tree) {
 		root.Value = lang.BuildString(token)
 	} else if lex.IsNumber(token) {
 		root.Value = lang.BuildNumber(token)
+	} else if lex.IsBoolean(token) {
+		root.Value = lang.BuildBoolean(token)
+	} else if lex.IsIdent(token) {
+		root.Value = lang.BuildPointer(token)
 	}
 
 }

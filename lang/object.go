@@ -39,3 +39,14 @@ func BuildPointer(_str string) Pointer {
 	ptr.name = _str
 	return ptr
 }
+
+//BuildBoolean build a new hub instance of Boolean
+func BuildBoolean(_str string) Boolean {
+	var ptr Boolean
+	v, err := strconv.ParseBool(_str)
+	if err != nil {
+		panic(err.Error())
+	}
+	ptr.value = v
+	return ptr
+}

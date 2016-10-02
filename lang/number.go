@@ -10,30 +10,30 @@ type Number struct {
 }
 
 //GetType of Number
-func (number *Number) GetType() string {
+func (number Number) GetType() string {
 	return "Number"
 }
 
 //GetValue of string
-func (number *Number) GetValue() float64 {
+func (number Number) GetValue() float64 {
 	return number.value
 }
 
 //GetHash address of reference
-func (number *Number) GetHash() int64 {
+func (number Number) GetHash() int64 {
 	return number.hash
 }
 
 //Equals assert equality between two number
-func (number *Number) Equals(obj Object) bool {
+func (number Number) Equals(obj Object) bool {
 	if obj.GetType() == "Number" {
-		s := obj.(*Number)
+		s := obj.(Number)
 		return s.GetValue() == number.GetValue()
 	}
 	return false
 }
 
 //ToString return a string representation about Number instance
-func (number *Number) ToString() string {
-	return strconv.FormatFloat(number.value, 'E', -1, 64)
+func (number Number) ToString() string {
+	return strconv.FormatFloat(number.value, 'f', -1, 64)
 }

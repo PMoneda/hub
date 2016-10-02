@@ -8,30 +8,30 @@ type String struct {
 }
 
 //GetType of String
-func (str *String) GetType() string {
+func (str String) GetType() string {
 	return "String"
 }
 
 //GetValue of string
-func (str *String) GetValue() string {
+func (str String) GetValue() string {
 	return str.value
 }
 
 //GetHash address of reference
-func (str *String) GetHash() int64 {
+func (str String) GetHash() int64 {
 	return str.hash
 }
 
 //Equals assert equality between two strings
-func (str *String) Equals(obj Object) bool {
+func (str String) Equals(obj Object) bool {
 	if obj.GetType() == "String" {
-		s := obj.(*String)
+		s := obj.(String)
 		return s.GetValue() == str.GetValue()
 	}
 	return false
 }
 
 //ToString return a string representation about String instance
-func (str *String) ToString() string {
+func (str String) ToString() string {
 	return str.value
 }
