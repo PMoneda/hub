@@ -14,6 +14,12 @@ type Object interface {
 	ToString() string
 }
 
+//Op define a interface for operators
+type Op interface {
+	HighPriority(Op) bool
+	GetSymbol() string
+}
+
 //BuildString build a new hub instance of String
 func BuildString(_str string) String {
 	var str String

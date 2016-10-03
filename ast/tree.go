@@ -5,14 +5,16 @@ import "fmt"
 //Tree implements a DataStructure
 type Tree struct {
 	Value    interface{}
-	Children []Tree
+	Children []*Tree
+	Parent   *Tree
 }
 
 //DeepWalk inside Tree
 func (tree *Tree) DeepWalk(callback func(interface{})) {
 	if tree.Children != nil {
 		for i := 0; i < len(tree.Children); i++ {
-			node := tree.Children[i]
+			nodes := tree.Children
+			node := nodes[i]
 			node.DeepWalk(callback)
 
 		}
@@ -29,8 +31,9 @@ func (tree *Tree) Print(callback func(interface{})) {
 	}
 	callback(tree.Value)
 	if tree.Children != nil {
-		for i := 0; i < len(tree.Children); i++ {
-			node := tree.Children[i]
+		nodes := tree.Children
+		for i := 0; i < len(nodes); i++ {
+			node := nodes[i]
 			deep++
 			node.Print(callback)
 		}
@@ -39,9 +42,25 @@ func (tree *Tree) Print(callback func(interface{})) {
 }
 
 //AppendChild to existing Tree
-func (tree *Tree) AppendChild(child Tree) {
+func (tree *Tree) AppendChild(child *Tree) {
 	if tree.Children == nil {
-		tree.Children = make([]Tree, 0)
+		tree.Children = make([]*Tree, 0)
 	}
+	(*child).Parent = tree
 	tree.Children = append(tree.Children, child)
+
+}
+
+//RemoveChild from existing Tree
+func (tree *Tree) RemoveChild(i int) {
+	tree.Children = append(tree.Children[:0], tree.Children[1:]...)
+}
+
+//ToString prints a tree node
+func (tree *Tree) ToString() string {
+	if tree == nil {
+		return "nil"
+	}
+	return fmt.Sprintf("%v", tree.Value)
+
 }

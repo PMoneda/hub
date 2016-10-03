@@ -11,10 +11,11 @@ func TestTree(t *testing.T) {
 	chd2 := Tree{Value: 12}
 	chd3 := Tree{Value: 13}
 	chd11 := Tree{Value: 111}
-	chd1.AppendChild(chd11)
-	root.AppendChild(chd1)
-	root.AppendChild(chd2)
-	root.AppendChild(chd3)
+	chd1.AppendChild(&chd11)
+	root.AppendChild(&chd1)
+	root.AppendChild(&chd2)
+	root.AppendChild(&chd3)
+
 	output := [...]int{111, 11, 12, 13, 1}
 	count := 0
 	root.DeepWalk(func(v interface{}) {

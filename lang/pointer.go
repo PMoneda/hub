@@ -1,7 +1,5 @@
 package lang
 
-import "strconv"
-
 //Pointer is the basic pointer reference for hub
 type Pointer struct {
 	name  string
@@ -35,8 +33,5 @@ func (pointer Pointer) Equals(obj Object) bool {
 
 //ToString return a string representation about Number instance
 func (pointer Pointer) ToString() string {
-	if pointer.value == nil {
-		return "[ident:" + pointer.name + " , hash: " + strconv.FormatInt(pointer.hash, 10) + ", value: nil ]"
-	}
-	return "[ident:" + pointer.name + " , hash: " + strconv.FormatInt(pointer.hash, 10) + ", value: " + pointer.value.ToString() + " ]"
+	return pointer.name
 }

@@ -33,3 +33,16 @@ func (operator Operator) Equals(obj Object) bool {
 func (operator Operator) ToString() string {
 	return operator.symbol
 }
+
+//HighPriority return if this operator has priority than other
+func (operator Operator) HighPriority(obj Op) bool {
+	if operator.symbol == "*" {
+		return true
+	}
+	return false
+}
+
+//GetSymbol return a string representation about Operator instance
+func (operator Operator) GetSymbol() string {
+	return operator.symbol
+}

@@ -8,6 +8,7 @@ import (
 	"github.com/PMoneda/hub/ast"
 	"github.com/PMoneda/hub/lang"
 	"github.com/PMoneda/hub/lexer"
+	"github.com/PMoneda/hub/utils"
 )
 
 //Interpreter instance to run hub code
@@ -33,7 +34,7 @@ func (interpreter *Interpreter) Run(lexer *lexer.Lexer) {
 			continue
 		}
 		interpreter.stmt(&execRoot, token)
-		interpreter.root.AppendChild(execRoot)
+		interpreter.root.AppendChild(&execRoot)
 	}
 
 }
@@ -99,6 +100,7 @@ func (interpreter *Interpreter) matchEOL(token string) {
 	if token == "\n" {
 		return
 	}
+	interpreter.printExecInfo()
 	panic("End of line expected")
 }
 
@@ -116,11 +118,9 @@ func (interpreter *Interpreter) varStmt(root *ast.Tree) {
 	decl.Op = "="
 
 	interpreter.exprStmt(&exp)
-	token := interpreter.lexer.Next()
-	interpreter.matchEOL(token)
 	root.Value = decl
-	root.AppendChild(iden)
-	root.AppendChild(exp)
+	root.AppendChild(&iden)
+	root.AppendChild(&exp)
 }
 func (interpreter *Interpreter) identStmt(parent *ast.Tree) {
 	id, err := interpreter.matchIdent()
@@ -133,6 +133,7 @@ func (interpreter *Interpreter) identStmt(parent *ast.Tree) {
 }
 
 func (interpreter *Interpreter) exprStmt(root *ast.Tree) {
+	root.Parent = nil
 	interpreter.E(root)
 }
 
@@ -143,33 +144,45 @@ func (interpreter *Interpreter) BuildObject(token string) lang.Object {
 		return lang.BuildNumber(token)
 	} else if lex.IsString(token) {
 		return lang.BuildString(token)
+	} else if lex.IsIdent(token) {
+		return lang.BuildPointer(token)
+	} else if lex.IsOperator(token) {
+		return lang.BuildOperator(token)
 	}
 	return nil
 }
 
 //E reflects a expression rule
 func (interpreter *Interpreter) E(root *ast.Tree) lang.Object {
+	exp := interpreter.convExpToStack()
+	root.Value = exp
+	//evaluate the expression
+	return nil
+}
+
+//Converts a expression to stack of operations
+func (interpreter *Interpreter) convExpToStack() utils.Stack {
 	lex := interpreter.lexer
 	token := lex.Next()
-	if token == "\n" {
-		return nil
-	} else if lex.IsOperator(token) {
-		return lang.BuildOperator(token)
+	var terms utils.Stack
+	var ops utils.Stack
+	for token != "\n" && token != "\\EOF\\" {
+		if !lex.IsOperator(token) {
+			terms.Push(interpreter.BuildObject(token))
+		} else {
+			currOp := interpreter.BuildObject(token).(lang.Op)
+			if !ops.IsEmpty() {
+				op := ops.Top().(lang.Op)
+				if op.HighPriority(currOp) {
+					terms.Push(ops.Pop())
+				}
+			}
+			ops.Push(currOp)
+		}
+		token = lex.Next()
 	}
-	obj := interpreter.E(root)
-
-	if obj != nil && obj.GetType() == "Operator" {
-		root.Value = obj
-		var left ast.Tree
-		left.Value = interpreter.BuildObject(token)
-		root.AppendChild(left)
-		var right ast.Tree
-		rr := interpreter.E(&right)
-		root.AppendChild(right)
-		return rr
-	} else if obj == nil && !lex.IsOperator(token) {
-		t := interpreter.BuildObject(token)
-		root.Value = t
+	for !ops.IsEmpty() {
+		terms.Push(ops.Pop())
 	}
-	return nil
+	return terms
 }
