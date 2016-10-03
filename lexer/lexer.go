@@ -178,6 +178,8 @@ func (lexer *Lexer) IsOperator(c string) bool {
 		return true
 	case "not":
 		return true
+	case "mod":
+		return true
 
 	}
 

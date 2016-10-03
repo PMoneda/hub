@@ -59,6 +59,12 @@ func (interpreter *Interpreter) stmt(parent *ast.Tree, token string) {
 	case "var":
 		interpreter.varStmt(parent)
 		return
+	case "print":
+		interpreter.printStmt(parent)
+		return
+	case "read":
+		interpreter.readStmt(parent)
+		return
 	}
 }
 func (interpreter *Interpreter) printExecInfo() {
@@ -102,6 +108,24 @@ func (interpreter *Interpreter) matchEOL(token string) {
 	}
 	interpreter.printExecInfo()
 	panic("End of line expected")
+}
+
+func (interpreter *Interpreter) readStmt(root *ast.Tree) {
+	var readStmt ast.ReadStmt
+	readStmt.Op = "read"
+	root.Value = readStmt
+	var idenNode ast.Tree
+	interpreter.identStmt(&idenNode)
+	root.AppendChild(&idenNode)
+}
+
+func (interpreter *Interpreter) printStmt(root *ast.Tree) {
+	var printStmt ast.PrintStmt
+	printStmt.Op = "print"
+	root.Value = printStmt
+	var expNode ast.Tree
+	interpreter.exprStmt(&expNode)
+	root.AppendChild(&expNode)
 }
 
 //Statement rule for list of commands

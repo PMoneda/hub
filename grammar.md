@@ -20,6 +20,8 @@ not
 import
 case
 switch
+print
+read
 else
 elif
 listen
@@ -37,6 +39,7 @@ program => END_PROG
 
 statement =>  : statements 
               | print expression
+              | read ID
               | get string function
               | post string function
               | read variable

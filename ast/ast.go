@@ -1,8 +1,6 @@
 //Package ast contains the Abstract Syntax Tree Implementation
 package ast
 
-import "fmt"
-
 //Node is the basic interface for AST
 type Node interface {
 	Print()
@@ -27,22 +25,12 @@ type DeclVar struct {
 	Op string
 }
 
-//Print prints AST node
-func (dec DeclVar) Print() {
-	fmt.Println(dec.Op)
+//PrintStmt is a stdio print command
+type PrintStmt struct {
+	Op string
 }
 
-//Print prints AST node
-func (ident Ident) Print() {
-	fmt.Println("Name: " + ident.Name)
-}
-
-//Print prints AST node
-func (dec Expr) Print() {
-	fmt.Println("Ola Mundo")
-}
-
-//Print root
-func (root RootNode) Print() {
-	fmt.Println("Start")
+//ReadStmt is a stdin read command
+type ReadStmt struct {
+	Op string
 }
