@@ -165,6 +165,8 @@ func (lexer *Lexer) IsOperator(c string) bool {
 		return true
 	case "*":
 		return true
+	case "**":
+		return true
 	case "/":
 		return true
 	case ";":

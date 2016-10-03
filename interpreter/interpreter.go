@@ -167,14 +167,41 @@ func (interpreter *Interpreter) convExpToStack() utils.Stack {
 	var terms utils.Stack
 	var ops utils.Stack
 	for token != "\n" && token != "\\EOF\\" {
-		if !lex.IsOperator(token) {
+		fmt.Println(token + "  ")
+		fmt.Print(!lex.IsOperator(token))
+		fmt.Print("   ")
+		fmt.Print(!lex.IsDelimiter(token))
+		fmt.Println()
+		fmt.Println("//////////////////")
+		if !lex.IsOperator(token) && !lex.IsDelimiter(token) {
 			terms.Push(interpreter.BuildObject(token))
+		} else if token == "(" {
+			ops.Push(token)
+		} else if token == ")" {
+			top := ops.Pop()
+			for top != "(" {
+				terms.Push(top)
+				if ops.IsEmpty() {
+					interpreter.printExecInfo()
+					panic("Invalid Expression")
+				} else {
+					top = ops.Pop()
+				}
+
+			}
+			fmt.Println()
+			ops.Print()
+			fmt.Println()
 		} else {
 			currOp := interpreter.BuildObject(token).(lang.Op)
 			if !ops.IsEmpty() {
-				op := ops.Top().(lang.Op)
-				if op.HighPriority(currOp) {
-					terms.Push(ops.Pop())
+				switch v := ops.Top().(type) {
+				case lang.Object:
+					op := v.(lang.Op)
+					if op.HighPriority(currOp) {
+						terms.Push(ops.Pop())
+					}
+					break
 				}
 			}
 			ops.Push(currOp)
@@ -184,5 +211,6 @@ func (interpreter *Interpreter) convExpToStack() utils.Stack {
 	for !ops.IsEmpty() {
 		terms.Push(ops.Pop())
 	}
+	fmt.Println()
 	return terms
 }

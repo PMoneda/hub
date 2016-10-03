@@ -36,7 +36,10 @@ func (operator Operator) ToString() string {
 
 //HighPriority return if this operator has priority than other
 func (operator Operator) HighPriority(obj Op) bool {
-	if operator.symbol == "*" {
+	if obj.GetSymbol() == "**" {
+		return false
+	}
+	if operator.symbol == "*" || operator.symbol == "/" {
 		return true
 	}
 	return false
