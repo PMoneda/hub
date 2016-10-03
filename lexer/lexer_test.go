@@ -1,6 +1,9 @@
 package lexer
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+)
 
 const (
 	tokenize = "./test/tokenize.hub"
@@ -9,7 +12,7 @@ const (
 func TestLexer(t *testing.T) {
 	lexer := Lexer{FileName: tokenize}
 	for lexer.HasNext() {
-		lexer.Next()
+		fmt.Print(lexer.Next() + " ")
 	}
 }
 func TestIsString(t *testing.T) {

@@ -40,6 +40,13 @@ func BuildPointer(_str string) Pointer {
 	return ptr
 }
 
+//BuildOperator build a new hub instance of Operator
+func BuildOperator(_str string) Operator {
+	var ptr Operator
+	ptr.symbol = _str
+	return ptr
+}
+
 //BuildBoolean build a new hub instance of Boolean
 func BuildBoolean(_str string) Boolean {
 	var ptr Boolean

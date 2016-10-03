@@ -1,6 +1,2 @@
-var a = 1 
-var b = 2
-var ab = 13123123.1231231315
-var c = a + b
-var hello = "world"
-var f = false
+var a = 1 + 1 + 1
+

@@ -44,6 +44,7 @@ func (interpreter *Interpreter) Print() {
 		default:
 			fmt.Println(v)
 		}
+		fmt.Println("-----------------------------")
 
 	})
 }
@@ -65,8 +66,7 @@ func (interpreter *Interpreter) printExecInfo() {
 	fmt.Println("Line")
 	fmt.Println(interpreter.lexer.GetLine())
 }
-func (interpreter *Interpreter) matchKeyword(keyword string) (string, error) {
-	next := interpreter.lexer.Next()
+func (interpreter *Interpreter) matchKeyword(next string, keyword string) (string, error) {
 	if next != keyword {
 		interpreter.printExecInfo()
 		err := errors.New("Expected: " + keyword + " got: " + next)
@@ -92,21 +92,29 @@ func (interpreter *Interpreter) matchEOF(token string) error {
 	return nil
 }
 
+func (interpreter *Interpreter) matchEOL(token string) {
+	if token == "\n" {
+		return
+	}
+	panic("End of line expected")
+}
+
 //Statement rule for list of commands
 func (interpreter *Interpreter) varStmt(root *ast.Tree) {
 	var decl ast.DeclVar
 	var iden ast.Tree
 	var exp ast.Tree
 	interpreter.identStmt(&iden)
-
-	_, err1 := interpreter.matchKeyword("=")
+	next := interpreter.lexer.Next()
+	_, err1 := interpreter.matchKeyword(next, "=")
 	if err1 != nil {
 		panic(err1.Error())
 	}
 	decl.Op = "="
 
 	interpreter.exprStmt(&exp)
-
+	token := interpreter.lexer.Next()
+	interpreter.matchEOL(token)
 	root.Value = decl
 	root.AppendChild(iden)
 	root.AppendChild(exp)
@@ -122,16 +130,42 @@ func (interpreter *Interpreter) identStmt(parent *ast.Tree) {
 }
 
 func (interpreter *Interpreter) exprStmt(root *ast.Tree) {
-	token := interpreter.lexer.Next()
-	lex := interpreter.lexer
-	if lex.IsString(token) {
-		root.Value = lang.BuildString(token)
-	} else if lex.IsNumber(token) {
-		root.Value = lang.BuildNumber(token)
-	} else if lex.IsBoolean(token) {
-		root.Value = lang.BuildBoolean(token)
-	} else if lex.IsIdent(token) {
-		root.Value = lang.BuildPointer(token)
-	}
+	interpreter.E(root)
+}
 
+//BuildObject based on token
+func (interpreter *Interpreter) BuildObject(token string) lang.Object {
+	lex := interpreter.lexer
+	if lex.IsNumber(token) {
+		return lang.BuildNumber(token)
+	} else if lex.IsString(token) {
+		return lang.BuildString(token)
+	}
+	return nil
+}
+
+//E reflects a expression rule
+func (interpreter *Interpreter) E(root *ast.Tree) lang.Object {
+	lex := interpreter.lexer
+	token := lex.Next()
+	if token == "\n" {
+		return nil
+	} else if lex.IsOperator(token) {
+		return lang.BuildOperator(token)
+	}
+	obj := interpreter.E(root)
+
+	if obj != nil && obj.GetType() == "Operator" {
+		root.Value = obj
+		var left ast.Tree
+		left.Value = interpreter.BuildObject(token)
+		root.AppendChild(left)
+		var right ast.Tree
+		root.AppendChild(right)
+		return interpreter.E(&right)
+	} else if obj == nil && !lex.IsOperator(token) {
+		t := interpreter.BuildObject(token)
+		root.Value = t
+	}
+	return nil
 }
