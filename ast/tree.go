@@ -24,6 +24,10 @@ var deep int
 
 //Print inside Tree
 func (tree *Tree) Print(callback func(interface{})) {
+	for i := 0; i < deep*4; i++ {
+		fmt.Print("-")
+	}
+	callback(tree.Value)
 	if tree.Children != nil {
 		for i := 0; i < len(tree.Children); i++ {
 			node := tree.Children[i]
@@ -31,10 +35,6 @@ func (tree *Tree) Print(callback func(interface{})) {
 			node.Print(callback)
 		}
 	}
-	for i := 0; i < deep; i++ {
-		fmt.Print("-")
-	}
-	callback(tree.Value)
 	deep--
 }
 
