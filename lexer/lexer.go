@@ -105,9 +105,6 @@ func (lexer *Lexer) HasNext() bool {
 func (lexer *Lexer) Tokenize(line string) []string {
 	var tokens []string
 	var buffer bytes.Buffer
-	if len(line) > 0 && line[0] == '#' {
-		return tokens
-	}
 	for i := 0; i < len(line); i++ {
 		if isComment(line[i]) {
 			if len(tokens) > 0 {
