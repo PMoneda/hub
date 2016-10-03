@@ -148,6 +148,8 @@ func (interpreter *Interpreter) BuildObject(token string) lang.Object {
 		return lang.BuildPointer(token)
 	} else if lex.IsOperator(token) {
 		return lang.BuildOperator(token)
+	} else if lex.IsBoolean(token) {
+		return lang.BuildBoolean(token)
 	}
 	return nil
 }
@@ -167,12 +169,6 @@ func (interpreter *Interpreter) convExpToStack() utils.Stack {
 	var terms utils.Stack
 	var ops utils.Stack
 	for token != "\n" && token != "\\EOF\\" {
-		fmt.Println(token + "  ")
-		fmt.Print(!lex.IsOperator(token))
-		fmt.Print("   ")
-		fmt.Print(!lex.IsDelimiter(token))
-		fmt.Println()
-		fmt.Println("//////////////////")
 		if !lex.IsOperator(token) && !lex.IsDelimiter(token) {
 			terms.Push(interpreter.BuildObject(token))
 		} else if token == "(" {
@@ -183,15 +179,11 @@ func (interpreter *Interpreter) convExpToStack() utils.Stack {
 				terms.Push(top)
 				if ops.IsEmpty() {
 					interpreter.printExecInfo()
-					panic("Invalid Expression")
+					panic("Invalid Expression: missing '('")
 				} else {
 					top = ops.Pop()
 				}
-
 			}
-			fmt.Println()
-			ops.Print()
-			fmt.Println()
 		} else {
 			currOp := interpreter.BuildObject(token).(lang.Op)
 			if !ops.IsEmpty() {
@@ -209,8 +201,15 @@ func (interpreter *Interpreter) convExpToStack() utils.Stack {
 		token = lex.Next()
 	}
 	for !ops.IsEmpty() {
-		terms.Push(ops.Pop())
+		switch v := ops.Pop().(type) {
+		case lang.Object:
+			terms.Push(v)
+			break
+		default:
+			interpreter.printExecInfo()
+			panic(fmt.Sprintf("Invalid expression  at: %v", v))
+		}
+
 	}
-	fmt.Println()
 	return terms
 }

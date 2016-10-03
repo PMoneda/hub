@@ -1,4 +1,6 @@
-var a = 1 * (2 + 1) / 3 ** 2
+var a = 1 * (2 + 1 / 3) ** 2
+var b = true and false
+var c = 1
 
 
 

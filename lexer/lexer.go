@@ -172,6 +172,12 @@ func (lexer *Lexer) IsOperator(c string) bool {
 		return true
 	case "?":
 		return true
+	case "and":
+		return true
+	case "or":
+		return true
+	case "not":
+		return true
 
 	}
 
