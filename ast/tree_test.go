@@ -1,6 +1,9 @@
 package ast
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+)
 
 func TestTree(t *testing.T) {
 	root := Tree{Value: 1}
@@ -19,5 +22,8 @@ func TestTree(t *testing.T) {
 			t.Fail()
 		}
 		count++
+	})
+	root.Print(func(value interface{}) {
+		fmt.Println(value)
 	})
 }

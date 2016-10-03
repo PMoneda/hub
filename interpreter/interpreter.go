@@ -24,9 +24,13 @@ func (interpreter *Interpreter) Run(lexer *lexer.Lexer) {
 	interpreter.root.Value = "BEGIN"
 	for lexer.HasNext() {
 		var execRoot ast.Tree
+
 		token := lexer.Next()
 		if token == "\\EOF\\" {
 			break
+		}
+		if token == "\n" {
+			continue
 		}
 		interpreter.stmt(&execRoot, token)
 		interpreter.root.AppendChild(execRoot)
@@ -36,7 +40,7 @@ func (interpreter *Interpreter) Run(lexer *lexer.Lexer) {
 
 //Print ast
 func (interpreter *Interpreter) Print() {
-	interpreter.root.DeepWalk(func(value interface{}) {
+	interpreter.root.Print(func(value interface{}) {
 		switch v := value.(type) {
 		case lang.Object:
 			fmt.Println(v.ToString())
@@ -44,7 +48,6 @@ func (interpreter *Interpreter) Print() {
 		default:
 			fmt.Println(v)
 		}
-		fmt.Println("-----------------------------")
 
 	})
 }
@@ -161,8 +164,9 @@ func (interpreter *Interpreter) E(root *ast.Tree) lang.Object {
 		left.Value = interpreter.BuildObject(token)
 		root.AppendChild(left)
 		var right ast.Tree
+		rr := interpreter.E(&right)
 		root.AppendChild(right)
-		return interpreter.E(&right)
+		return rr
 	} else if obj == nil && !lex.IsOperator(token) {
 		t := interpreter.BuildObject(token)
 		root.Value = t
