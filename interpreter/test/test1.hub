@@ -1,24 +1,24 @@
 var a = 1 * (2 + 1 / 3) ** 2;
 var b = true and false;
 var c = 1;
+var e = f.g.a + r.g.b
 var c = 10 mod 2;
 var c = "a" + "b";
 print "Ola";
 read a;
 if 1 > 2  {
-    var a = b;
-    var a = b;
-    var a = b;
-    var a = b;
+    print "A";
     if 3 < 2 {
-        print "ola";
+        print "B";
         if true and false {
-            print "Moneda";
+            print "C";
+        }else if 10 > 5 {
+            print "D";
         }
-    }
-    var a = b;
-    var a = b;
-    var a = b;
+        else{
+            print "E";
+        }
+    }    
 
 }
 

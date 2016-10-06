@@ -154,16 +154,20 @@ func (interpreter *Interpreter) readIf(root *ast.Tree) {
 	interpreter.exprStmt(&cond)
 	token := interpreter.lexer.Current()
 	interpreter.stmtBlock(&cond, token)
-	//token = interpreter.lexer.Next()
+	token = interpreter.lexer.Next()
 	if token == "else" {
 		token = interpreter.lexer.Next()
-		interpreter.stmtBlock(&cond, token)
-		root.AppendChild(&cond)
+		if token == "if" {
+			var right ast.Tree
+			interpreter.readIf(&right)
+			cond.AppendChild(&right)
+		} else {
+			interpreter.stmtBlock(&cond, token)
+		}
 	} else {
-		root.AppendChild(&cond)
-		//interpreter.stmt(root, token)
+		interpreter.lexer.GiveTokenBack()
 	}
-
+	root.AppendChild(&cond)
 }
 
 func (interpreter *Interpreter) printStmt(root *ast.Tree) {
