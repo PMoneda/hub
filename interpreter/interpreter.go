@@ -68,9 +68,26 @@ func (interpreter *Interpreter) stmt(parent *ast.Tree, token string) error {
 		interpreter.readStmt(parent)
 		return nil
 	case "if":
-		interpreter.readIf(parent)
+		interpreter.ifStmt(parent)
+		return nil
+	case "for":
+		interpreter.forStmt(parent)
 		return nil
 	default:
+		if interpreter.lexer.IsIdent(token) {
+			ident := token
+			token = interpreter.lexer.Next()
+			if token == "++" || token == "--" {
+				var op ast.Tree
+				parent.Value = token
+				op.Value = ident
+				token = interpreter.lexer.Next()
+				interpreter.matchEndOfCommand(token)
+				parent.AppendChild(&op)
+				return nil
+			}
+
+		}
 		return errors.New("end")
 
 	}
@@ -147,9 +164,19 @@ func (interpreter *Interpreter) stmtBlock(root *ast.Tree, token string) {
 	token = interpreter.lexer.Current()
 	interpreter.matchKeyword("}", token)
 }
-func (interpreter *Interpreter) readIf(root *ast.Tree) {
-	root.Value = "if"
+
+func (interpreter *Interpreter) forStmt(root *ast.Tree) {
+	root.Value = "for"
 	//var right ast.Tree
+	var cond ast.Tree
+	interpreter.exprStmt(&cond)
+	token := interpreter.lexer.Current()
+	interpreter.stmtBlock(&cond, token)
+	root.AppendChild(&cond)
+}
+
+func (interpreter *Interpreter) ifStmt(root *ast.Tree) {
+	root.Value = "if"
 	var cond ast.Tree
 	interpreter.exprStmt(&cond)
 	token := interpreter.lexer.Current()
@@ -159,7 +186,7 @@ func (interpreter *Interpreter) readIf(root *ast.Tree) {
 		token = interpreter.lexer.Next()
 		if token == "if" {
 			var right ast.Tree
-			interpreter.readIf(&right)
+			interpreter.ifStmt(&right)
 			cond.AppendChild(&right)
 		} else {
 			interpreter.stmtBlock(&cond, token)

@@ -159,10 +159,14 @@ func (lexer *Lexer) IsOperator(c string) bool {
 		return true
 	case "**":
 		return true
+	case "++":
+		return true
+	case "--":
+		return true
 	case "/":
 		return true
 	case ";":
-		return true
+		return false
 	case "!":
 		return true
 	case "?":
