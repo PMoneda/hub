@@ -18,6 +18,7 @@ type Lexer struct {
 	currentLine  int
 	tokenBuffer  []string
 	currentToken int
+	lines        [][]string
 	line         string
 }
 
@@ -54,8 +55,26 @@ func (lexer *Lexer) ConsumeNewLine(token string) string {
 
 //Current token
 func (lexer *Lexer) Current() string {
-	if len(lexer.tokenBuffer) >= (lexer.currentToken - 1) {
-		return lexer.tokenBuffer[lexer.currentToken-1]
+	//has line buffer
+	if len(lexer.lines) > 0 {
+		if (lexer.currentToken - 1) < 0 {
+			toks := lexer.lines[len(lexer.line)-2]
+			return toks[len(toks)-1]
+		} else if len(lexer.tokenBuffer) >= (lexer.currentToken - 1) {
+			return lexer.tokenBuffer[lexer.currentToken-1]
+		}
+	}
+	return ""
+}
+
+//GiveUp the current token
+func (lexer *Lexer) GiveUp() string {
+	//has line buffer
+	if (lexer.currentToken - 1) < 0 {
+		lexer.currentToken = 0
+		lexer.currentLine--
+	} else {
+		lexer.currentToken--
 	}
 	return ""
 }
@@ -79,7 +98,7 @@ func (lexer *Lexer) Next() string {
 		}
 		lexer.currentToken = 1
 		lexer.tokenBuffer = lexer.Tokenize(line)
-
+		lexer.lines = append(lexer.lines, tokens)
 		return lexer.tokenBuffer[0]
 	}
 
@@ -104,6 +123,7 @@ func (lexer *Lexer) HasNext() bool {
 		lexer.currentToken = 0
 		line := lexer.NextLine()
 		lexer.tokenBuffer = lexer.Tokenize(line)
+		lexer.lines = append(lexer.lines, lexer.tokenBuffer)
 		return true
 	}
 	if lexer.currentToken < len(lexer.tokenBuffer) {
@@ -114,6 +134,7 @@ func (lexer *Lexer) HasNext() bool {
 		lexer.currentToken = 0
 		line := lexer.NextLine()
 		lexer.tokenBuffer = lexer.Tokenize(line)
+		lexer.lines = append(lexer.lines, lexer.tokenBuffer)
 	}
 	return hasNext
 }

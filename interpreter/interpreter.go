@@ -138,13 +138,7 @@ func (interpreter *Interpreter) readStmt(root *ast.Tree) {
 	interpreter.matchEndOfCommand(next)
 	root.AppendChild(&idenNode)
 }
-
-func (interpreter *Interpreter) readIf(root *ast.Tree) {
-	root.Value = "if"
-	//var right ast.Tree
-	var cond ast.Tree
-	interpreter.exprStmt(&cond)
-	token := interpreter.lexer.Current()
+func (interpreter *Interpreter) stmtBlock(root *ast.Tree, token string) {
 	interpreter.matchKeyword("{", token)
 	for token != "}" {
 		var left ast.Tree
@@ -152,12 +146,30 @@ func (interpreter *Interpreter) readIf(root *ast.Tree) {
 
 		stmt := interpreter.stmt(&left, token)
 		if stmt == nil {
-			cond.AppendChild(&left)
+			root.AppendChild(&left)
 		}
 	}
 	token = interpreter.lexer.Current()
 	interpreter.matchKeyword("}", token)
-	root.AppendChild(&cond)
+}
+func (interpreter *Interpreter) readIf(root *ast.Tree) {
+	root.Value = "if"
+	//var right ast.Tree
+	var cond ast.Tree
+	interpreter.exprStmt(&cond)
+	token := interpreter.lexer.Current()
+	interpreter.stmtBlock(&cond, token)
+	//token = interpreter.lexer.Next()
+	if token == "else" {
+		token = interpreter.lexer.Next()
+		interpreter.stmtBlock(&cond, token)
+		root.AppendChild(&cond)
+	} else {
+		fmt.Println("Merda")
+		root.AppendChild(&cond)
+		//interpreter.stmt(root, token)
+	}
+
 }
 
 func (interpreter *Interpreter) printStmt(root *ast.Tree) {
