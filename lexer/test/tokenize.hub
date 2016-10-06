@@ -1,12 +1,14 @@
 #comment
-var a = 1 #comment2
-var b = 2
-var c = a + b
-var hello = "world"
-var hello = "hello"+"world"
-var hel = "hello world"
-print c
+var a = 1; #comment2
+var b = 2;
+var c = a + b;
+var hello = "world";
+var hello = "hello"+"world";
+var hel = "hello world";
+print c;
 
-for a = 1; a < 10; a++ {
-    print a
+if a > 2 {
+    print c;
+
+    var c = a + b;
 }

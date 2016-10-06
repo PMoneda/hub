@@ -30,9 +30,6 @@ func (interpreter *Interpreter) Run(lexer *lexer.Lexer) {
 		if token == "\\EOF\\" {
 			break
 		}
-		if token == "\n" {
-			continue
-		}
 		interpreter.stmt(&execRoot, token)
 		interpreter.root.AppendChild(&execRoot)
 	}
@@ -41,7 +38,12 @@ func (interpreter *Interpreter) Run(lexer *lexer.Lexer) {
 
 //Print ast
 func (interpreter *Interpreter) Print() {
-	interpreter.root.Print(func(value interface{}) {
+	interpreter.print(&interpreter.root)
+}
+
+//Print ast
+func (interpreter *Interpreter) print(root *ast.Tree) {
+	root.Print(func(value interface{}) {
 		switch v := value.(type) {
 		case lang.Object:
 			fmt.Println(v.ToString())
@@ -54,17 +56,24 @@ func (interpreter *Interpreter) Print() {
 }
 
 //exec is the initial point of execution and starts with de first token on hub script
-func (interpreter *Interpreter) stmt(parent *ast.Tree, token string) {
+func (interpreter *Interpreter) stmt(parent *ast.Tree, token string) error {
 	switch token {
 	case "var":
 		interpreter.varStmt(parent)
-		return
+		return nil
 	case "print":
 		interpreter.printStmt(parent)
-		return
+		return nil
 	case "read":
 		interpreter.readStmt(parent)
-		return
+		return nil
+	case "if":
+		interpreter.readIf(parent)
+		return nil
+	default:
+		fmt.Println(token)
+		return errors.New("end")
+
 	}
 }
 func (interpreter *Interpreter) printExecInfo() {
@@ -80,7 +89,8 @@ func (interpreter *Interpreter) matchKeyword(next string, keyword string) (strin
 	if next != keyword {
 		interpreter.printExecInfo()
 		err := errors.New("Expected: " + keyword + " got: " + next)
-		return "", err
+		//return "", err
+		panic(err.Error())
 	}
 	return next, nil //OK
 }
@@ -102,6 +112,14 @@ func (interpreter *Interpreter) matchEOF(token string) error {
 	return nil
 }
 
+func (interpreter *Interpreter) matchEndOfCommand(token string) {
+	if token == ";" {
+		return
+	}
+	interpreter.printExecInfo()
+	panic("; expected")
+}
+
 func (interpreter *Interpreter) matchEOL(token string) {
 	if token == "\n" {
 		return
@@ -116,7 +134,30 @@ func (interpreter *Interpreter) readStmt(root *ast.Tree) {
 	root.Value = readStmt
 	var idenNode ast.Tree
 	interpreter.identStmt(&idenNode)
+	next := interpreter.lexer.Next()
+	interpreter.matchEndOfCommand(next)
 	root.AppendChild(&idenNode)
+}
+
+func (interpreter *Interpreter) readIf(root *ast.Tree) {
+	root.Value = "if"
+	//var right ast.Tree
+	var cond ast.Tree
+	interpreter.exprStmt(&cond)
+	token := interpreter.lexer.Current()
+	interpreter.matchKeyword("{", token)
+	for token != "}" {
+		var left ast.Tree
+		token = interpreter.lexer.Next()
+
+		stmt := interpreter.stmt(&left, token)
+		if stmt == nil {
+			cond.AppendChild(&left)
+		}
+	}
+	token = interpreter.lexer.Current()
+	interpreter.matchKeyword("}", token)
+	root.AppendChild(&cond)
 }
 
 func (interpreter *Interpreter) printStmt(root *ast.Tree) {
@@ -125,6 +166,8 @@ func (interpreter *Interpreter) printStmt(root *ast.Tree) {
 	root.Value = printStmt
 	var expNode ast.Tree
 	interpreter.exprStmt(&expNode)
+	token := interpreter.lexer.Current()
+	interpreter.matchEndOfCommand(token)
 	root.AppendChild(&expNode)
 }
 
@@ -140,8 +183,9 @@ func (interpreter *Interpreter) varStmt(root *ast.Tree) {
 		panic(err1.Error())
 	}
 	decl.Op = "="
-
 	interpreter.exprStmt(&exp)
+	next = interpreter.lexer.Current()
+	interpreter.matchEndOfCommand(next)
 	root.Value = decl
 	root.AppendChild(&iden)
 	root.AppendChild(&exp)
@@ -157,7 +201,7 @@ func (interpreter *Interpreter) identStmt(parent *ast.Tree) {
 }
 
 func (interpreter *Interpreter) exprStmt(root *ast.Tree) {
-	root.Parent = nil
+
 	interpreter.E(root)
 }
 
@@ -192,8 +236,8 @@ func (interpreter *Interpreter) convExpToStack() utils.Stack {
 	token := lex.Next()
 	var terms utils.Stack
 	var ops utils.Stack
-	for token != "\n" && token != "\\EOF\\" {
-		if !lex.IsOperator(token) && !lex.IsDelimiter(token) {
+	for !lex.IsBlockDelimiter(token) && !lex.IsCommandDelimiter(token) && token != "\\EOF\\" {
+		if !lex.IsOperator(token) && !lex.IsParenhesis(token) {
 			terms.Push(interpreter.BuildObject(token))
 		} else if token == "(" {
 			ops.Push(token)

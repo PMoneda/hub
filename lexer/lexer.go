@@ -44,6 +44,22 @@ func (lexer *Lexer) NextLine() string {
 	return text
 }
 
+//ConsumeNewLine until other token found
+func (lexer *Lexer) ConsumeNewLine(token string) string {
+	for token == "\n" {
+		token = lexer.Next()
+	}
+	return token
+}
+
+//Current token
+func (lexer *Lexer) Current() string {
+	if len(lexer.tokenBuffer) >= (lexer.currentToken - 1) {
+		return lexer.tokenBuffer[lexer.currentToken-1]
+	}
+	return ""
+}
+
 //Next return the next token
 func (lexer *Lexer) Next() string {
 	if len(lexer.tokenBuffer) > lexer.currentToken {
@@ -58,6 +74,7 @@ func (lexer *Lexer) Next() string {
 			tokens = lexer.Tokenize(line)
 		}
 		if !lexer.HasNext() {
+
 			return "\\EOF\\"
 		}
 		lexer.currentToken = 1
@@ -106,11 +123,14 @@ func (lexer *Lexer) Tokenize(line string) []string {
 	var tokens []string
 	var buffer bytes.Buffer
 	for i := 0; i < len(line); i++ {
+		if line[i] == '\n' {
+			continue
+		}
 		if isComment(line[i]) {
-			if len(tokens) > 0 {
-				tokens = append(tokens, "\n")
-			}
 			return tokens
+		} else if line[i] == ';' {
+			buffer.WriteString(string(line[i]))
+			tokens = append(tokens, buffer.String())
 		} else if line[i] == '"' {
 			buffer.WriteString(string(line[i]))
 			i++
@@ -140,7 +160,6 @@ func (lexer *Lexer) Tokenize(line string) []string {
 		}
 		buffer.Reset()
 	}
-	tokens = append(tokens, "\n")
 	return tokens
 }
 func isComment(c byte) bool {
@@ -202,6 +221,30 @@ func (lexer *Lexer) IsDelimiter(c string) bool {
 	return false
 }
 
+//IsParenhesis returns true with token is a block parenthesis
+func (lexer *Lexer) IsParenhesis(c string) bool {
+	switch c {
+	case "(":
+		return true
+	case ")":
+		return true
+	}
+
+	return false
+}
+
+//IsBlockDelimiter returns true with token is a block delimiter
+func (lexer *Lexer) IsBlockDelimiter(c string) bool {
+	switch c {
+	case "{":
+		return true
+	case "}":
+		return true
+	}
+
+	return false
+}
+
 func isIdent(c byte) bool {
 	return c == '.' || 'A' <= c && c <= 'Z' || 'a' <= c && c <= 'z' || '0' <= c && c <= '9' || c == '_' || c >= utf8.RuneSelf
 }
@@ -231,6 +274,11 @@ func (lexer *Lexer) IsBoolean(token string) bool {
 func (lexer *Lexer) IsNumber(token string) bool {
 	r, _ := utf8.DecodeRuneInString(token)
 	return unicode.IsNumber(r)
+}
+
+//IsCommandDelimiter returns true if token is ;
+func (lexer *Lexer) IsCommandDelimiter(token string) bool {
+	return token == ";"
 }
 
 //IsKeyword returns true if token is reserved word
