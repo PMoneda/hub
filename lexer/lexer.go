@@ -11,101 +11,59 @@ import (
 
 //Lexer struct to parse tokens
 type Lexer struct {
-	file         *os.File
-	offset       int
-	FileName     string
-	scanner      *bufio.Scanner
-	currentLine  int
-	tokenBuffer  []string
-	currentToken int
-	lines        [][]string
-	line         string
+	file        *os.File
+	offset      int
+	FileName    string
+	nextToken   int
+	tokens      []Token
+	totalTokens int
 }
 
-//GetCurrentLine gets current lexer linenumber
-func (lexer *Lexer) GetCurrentLine() int {
-	return lexer.currentLine
+//Token describe a basic struct for tokens
+type Token struct {
+	Value string
+	Line  int
+	Index int
 }
 
-//GetLine get current line
-func (lexer *Lexer) GetLine() string {
-	return lexer.line
-}
-
-//GetCurrentToken returns index of current token
-func (lexer *Lexer) GetCurrentToken() int {
-	return lexer.currentToken
-}
-
-//NextLine of code
-func (lexer *Lexer) NextLine() string {
-	text := lexer.scanner.Text()
-	lexer.currentLine++
-	lexer.line = text
-	return text
-}
-
-//ConsumeNewLine until other token found
-func (lexer *Lexer) ConsumeNewLine(token string) string {
-	for token == "\n" {
-		token = lexer.Next()
-	}
-	return token
+//GetTokenInfo return info about current token
+func (lexer *Lexer) GetTokenInfo() Token {
+	return lexer.tokens[lexer.nextToken-1]
 }
 
 //Current token
 func (lexer *Lexer) Current() string {
-	//has line buffer
-	if len(lexer.lines) > 0 {
-		if (lexer.currentToken - 1) < 0 {
-			toks := lexer.lines[len(lexer.line)-2]
-			return toks[len(toks)-1]
-		} else if len(lexer.tokenBuffer) >= (lexer.currentToken - 1) {
-			return lexer.tokenBuffer[lexer.currentToken-1]
-		}
-	}
-	return ""
+	return lexer.tokens[lexer.nextToken-1].Value
 }
 
-//GiveUp the current token
-func (lexer *Lexer) GiveUp() string {
-	//has line buffer
-	if (lexer.currentToken - 1) < 0 {
-		lexer.currentToken = 0
-		lexer.currentLine--
-	} else {
-		lexer.currentToken--
+//Previous token
+func (lexer *Lexer) Previous() Token {
+	if lexer.nextToken == 0 {
+		return lexer.tokens[0]
 	}
-	return ""
+	return lexer.tokens[lexer.nextToken-2]
+}
+
+//GiveTokenBack to the unread state
+func (lexer *Lexer) GiveTokenBack() {
+	lexer.nextToken--
+	if lexer.nextToken < 0 {
+		lexer.nextToken = 0
+	}
 }
 
 //Next return the next token
 func (lexer *Lexer) Next() string {
-	if len(lexer.tokenBuffer) > lexer.currentToken {
-		token := lexer.tokenBuffer[lexer.currentToken]
-		lexer.currentToken++
-		return token
-	} else if lexer.HasNext() {
-		line := lexer.NextLine()
-		tokens := lexer.Tokenize(line)
-		for len(tokens) == 0 && lexer.HasNext() {
-			line = lexer.NextLine()
-			tokens = lexer.Tokenize(line)
-		}
-		if !lexer.HasNext() {
-
-			return "\\EOF\\"
-		}
-		lexer.currentToken = 1
-		lexer.tokenBuffer = lexer.Tokenize(line)
-		lexer.lines = append(lexer.lines, tokens)
-		return lexer.tokenBuffer[0]
+	if lexer.nextToken >= len(lexer.tokens) {
+		return "\\EOF\\"
 	}
-
-	return "\\EOF\\"
+	curr := lexer.tokens[lexer.nextToken].Value
+	lexer.nextToken++
+	return curr
 }
 
-func (lexer *Lexer) openFile() {
+//Parse read the code file and execute  lexical parsing
+func (lexer *Lexer) Parse() {
 	f, err := os.Open(lexer.FileName)
 	if err != nil {
 		panic(err.Error())
@@ -113,30 +71,27 @@ func (lexer *Lexer) openFile() {
 	lexer.file = f
 	scanner := bufio.NewScanner(f)
 	scanner.Split(bufio.ScanLines)
-	lexer.scanner = scanner
+
+	totalLine := 1
+	for scanner.Scan() {
+		line := scanner.Text()
+		tokenBuffer := lexer.Tokenize(line)
+		for i := 0; i < len(tokenBuffer); i++ {
+			var tok Token
+			tok.Value = tokenBuffer[i]
+			tok.Line = totalLine
+			tok.Index = i + 1
+			lexer.tokens = append(lexer.tokens, tok)
+		}
+		totalLine++
+	}
+	lexer.nextToken = 0
+	lexer.totalTokens = len(lexer.tokens)
 }
 
 //HasNext line to read
 func (lexer *Lexer) HasNext() bool {
-	if lexer.scanner == nil {
-		lexer.openFile()
-		lexer.currentToken = 0
-		line := lexer.NextLine()
-		lexer.tokenBuffer = lexer.Tokenize(line)
-		lexer.lines = append(lexer.lines, lexer.tokenBuffer)
-		return true
-	}
-	if lexer.currentToken < len(lexer.tokenBuffer) {
-		return true
-	}
-	hasNext := lexer.scanner.Scan()
-	if hasNext {
-		lexer.currentToken = 0
-		line := lexer.NextLine()
-		lexer.tokenBuffer = lexer.Tokenize(line)
-		lexer.lines = append(lexer.lines, lexer.tokenBuffer)
-	}
-	return hasNext
+	return lexer.nextToken < lexer.totalTokens
 }
 
 //Tokenize line command

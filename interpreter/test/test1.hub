@@ -12,9 +12,9 @@ if 1 > 2  {
     var a = b;
     if 3 < 2 {
         print "ola";
-        var a = b;
-        var a = b;
-        var a = b;
+        if true and false {
+            print "Moneda";
+        }
     }
     var a = b;
     var a = b;

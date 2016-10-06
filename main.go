@@ -16,6 +16,7 @@ func main() {
 	fmt.Println("Hello Hub")
 
 	lexer := lexer.Lexer{FileName: test1}
+	lexer.Parse()
 	/*for lexer.HasNext() {
 		fmt.Print(lexer.Next() + " ")
 	}*/

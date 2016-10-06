@@ -71,19 +71,13 @@ func (interpreter *Interpreter) stmt(parent *ast.Tree, token string) error {
 		interpreter.readIf(parent)
 		return nil
 	default:
-		fmt.Println(token)
 		return errors.New("end")
 
 	}
 }
 func (interpreter *Interpreter) printExecInfo() {
-	fmt.Print("line: ")
-	fmt.Print(interpreter.lexer.GetCurrentLine())
-	fmt.Print(" token: ")
-	fmt.Print(interpreter.lexer.GetCurrentToken())
-	fmt.Println()
-	fmt.Println("Line")
-	fmt.Println(interpreter.lexer.GetLine())
+	tok := interpreter.lexer.GetTokenInfo()
+	fmt.Printf("error at line %d token %d near %s\n", tok.Line, tok.Index, tok.Value)
 }
 func (interpreter *Interpreter) matchKeyword(next string, keyword string) (string, error) {
 	if next != keyword {
@@ -106,7 +100,8 @@ func (interpreter *Interpreter) matchIdent() (string, error) {
 }
 func (interpreter *Interpreter) matchEOF(token string) error {
 	if token == "\\EOF\\" {
-		err := errors.New("Unexpected end of file line: " + string(interpreter.lexer.GetCurrentLine()))
+		tok := interpreter.lexer.Previous()
+		err := errors.New("Unexpected end of file line: " + string(tok.Line))
 		return err
 	}
 	return nil
@@ -165,7 +160,6 @@ func (interpreter *Interpreter) readIf(root *ast.Tree) {
 		interpreter.stmtBlock(&cond, token)
 		root.AppendChild(&cond)
 	} else {
-		fmt.Println("Merda")
 		root.AppendChild(&cond)
 		//interpreter.stmt(root, token)
 	}
