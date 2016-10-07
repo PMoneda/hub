@@ -1,0 +1,54 @@
+#comment
+var a = 1; #comment2
+var b = 2;
+var c = a + b;
+var hello = "world";
+print c;
+
+if a > 2 {
+    print "sim";
+}else{
+    print "nao"
+}
+read c
+
+COMPILA PARA
+
+begin:
+    CPUSH               #ALOCA CONTEXTO PRINCIPAL
+    LOAD a              #Carrega a no contexto
+    BUFF1 1             #Aloca 1 no Buffer
+    MOV BUFF1 a         #Preenche a com BUFF1
+    LOAD b              #carrega b
+    BUFF1 2             #Aloca 2 no BUFF1
+    MOV BUFF1 b         #Preenche b com BUFF1
+    LOAD c              #Carrega c
+    MOV b BUFF1         #Move b para BUFF1
+    MOV a BUFF2         #Move b para BUFF2
+    SUM                 #SOMA BUFF1 + BUFF2 e aloca resultado em BUFF1
+    MOV BUFF1 c         #Adiciona o resultado em c
+    LOAD hello          #carrega hello
+    BUFF1 "world"       #aloca palavra no BUFF1
+    MOV BUFF1 hello     #preenche hello com "world"
+    MOV c BUFF1         #aloca c no BUFF1
+    PRINT               #escreve BUFF1 no stdio
+    MOV 2 BUFF1
+    MOV a BUFF2
+    BIGTHAN             #BUFF2 > BUFF1
+    IFTRUE maior ou_nao #Se BUFF1 eh true executa maior senao executa ou_nao
+maior:
+    MOV "sim" BUFF1
+    PRINT
+    JMP endif
+ou_nao:
+    MOV "nao" BUFF1
+    PRINT
+    JMP endif
+endif:
+    LOAD c
+    READ
+    MOV BUFF1 c
+
+
+
+
