@@ -4,8 +4,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/PMoneda/hub/interpreter"
-	"github.com/PMoneda/hub/lexer"
+	"github.com/PMoneda/hub/workflow"
 )
 
 const (
@@ -14,13 +13,6 @@ const (
 
 func main() {
 	fmt.Println("Hello Hub")
-
-	lexer := lexer.Lexer{FileName: test1}
-	lexer.Parse()
-	/*for lexer.HasNext() {
-		fmt.Print(lexer.Next() + " ")
-	}*/
-	var inter interpreter.Interpreter
-	inter.Run(&lexer)
-	inter.Print()
+	var flow workflow.Workflow
+	flow.Lex(test1).BuildAst().Print().Compile()
 }

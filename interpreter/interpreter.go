@@ -18,6 +18,11 @@ type Interpreter struct {
 	root           ast.Tree
 }
 
+//GetAst built from file
+func (interpreter *Interpreter) GetAst() *ast.Tree {
+	return &interpreter.root
+}
+
 //Run execute a hub script
 func (interpreter *Interpreter) Run(lexer *lexer.Lexer) {
 	interpreter.lexer = lexer

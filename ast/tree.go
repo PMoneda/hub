@@ -41,6 +41,18 @@ func (tree *Tree) Print(callback func(interface{})) {
 	deep--
 }
 
+//Walk inside the Tree
+func (tree *Tree) Walk(callback func(interface{})) {
+	callback(tree.Value)
+	if tree.Children != nil {
+		nodes := tree.Children
+		for i := 0; i < len(nodes); i++ {
+			node := nodes[i]
+			node.Walk(callback)
+		}
+	}
+}
+
 //AppendChild to existing Tree
 func (tree *Tree) AppendChild(child *Tree) {
 	if tree.Children == nil {
