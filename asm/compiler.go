@@ -21,6 +21,7 @@ const (
 	SUB   = "sub"
 	PUSH  = "push"
 	POP   = "pop"
+	READ  = "read"
 )
 
 //OpCode represents opcode for hub

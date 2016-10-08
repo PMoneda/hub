@@ -23,6 +23,16 @@ func (visitor *StmtVisitor) Visit(node *ast.Tree) {
 		exp := node.Children[1]
 		declStmt.Compile(iden.Value.(lang.Pointer), exp.Value.(utils.Stack))
 		break
+	case ast.PrintStmt:
+		var printStmt asm.PrintCompiler
+		exp := node.Children[0]
+		printStmt.Compile(exp.Value.(utils.Stack))
+		break
+	case ast.ReadStmt:
+		var readStmt asm.ReadCompiler
+		exp := node.Children[0]
+		readStmt.Compile(exp.Value.(lang.Pointer))
+		break
 	default:
 		fmt.Println(v)
 	}
