@@ -27,7 +27,9 @@ func (interpreter *Interpreter) GetAst() *ast.Tree {
 func (interpreter *Interpreter) Run(lexer *lexer.Lexer) {
 	interpreter.lexer = lexer
 	interpreter.root = *new(ast.Tree)
-	interpreter.root.Value = "BEGIN"
+	var begin ast.Begin
+	begin.Op = "BEGIN"
+	interpreter.root.Value = begin
 	for lexer.HasNext() {
 		var execRoot ast.Tree
 
@@ -171,7 +173,9 @@ func (interpreter *Interpreter) stmtBlock(root *ast.Tree, token string) {
 }
 
 func (interpreter *Interpreter) forStmt(root *ast.Tree) {
-	root.Value = "for"
+	var forStmt ast.ForStmt
+	forStmt.Op = "for"
+	root.Value = forStmt
 	//var right ast.Tree
 	var cond ast.Tree
 	interpreter.exprStmt(&cond)
@@ -181,7 +185,9 @@ func (interpreter *Interpreter) forStmt(root *ast.Tree) {
 }
 
 func (interpreter *Interpreter) ifStmt(root *ast.Tree) {
-	root.Value = "if"
+	var ifStmt ast.IfStmt
+	ifStmt.Op = "if"
+	root.Value = ifStmt
 	var cond ast.Tree
 	interpreter.exprStmt(&cond)
 	token := interpreter.lexer.Current()

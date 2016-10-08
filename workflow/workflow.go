@@ -2,9 +2,12 @@
 package workflow
 
 import (
+	"fmt"
+
 	"github.com/PMoneda/hub/asm"
 	"github.com/PMoneda/hub/interpreter"
 	"github.com/PMoneda/hub/lexer"
+	"github.com/PMoneda/hub/visitors"
 )
 
 //Workflow contains information about interpreter
@@ -35,6 +38,10 @@ func (workflow *Workflow) Print() *Workflow {
 
 // Compile ast into hub code
 func (workflow *Workflow) Compile() *Workflow {
-	asm.Compile(workflow.inter.GetAst())
+	var begin visitors.BeginVisitor
+	begin.Visit(workflow.inter.GetAst())
+	for _, cmd := range asm.Program {
+		fmt.Println(cmd)
+	}
 	return workflow
 }

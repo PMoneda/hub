@@ -3,7 +3,6 @@ package ast
 
 //Node is the basic interface for AST
 type Node interface {
-	Print()
 }
 
 //Expr is a Expresion Node
@@ -32,5 +31,20 @@ type PrintStmt struct {
 
 //ReadStmt is a stdin read command
 type ReadStmt struct {
+	Op string
+}
+
+//IfStmt is if cond Comand
+type IfStmt struct {
+	Op string
+}
+
+//ForStmt is loop  Comand
+type ForStmt struct {
+	Op string
+}
+
+//Begin is entry point node
+type Begin struct {
 	Op string
 }
