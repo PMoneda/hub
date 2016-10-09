@@ -194,8 +194,8 @@ func (interpreter *Interpreter) ifStmt(root *ast.Tree) {
 	var cond ast.Tree
 	var istrue ast.Tree
 	var isElse ast.Tree
-	istrue.Value = "IF_BLOCK"
-	isElse.Value = "ELSE_BLOCK"
+	istrue.Value = ast.IFBlock{Op: "IF_BLOCK"}
+	isElse.Value = ast.ElseBlock{Op: "ELSE_BLOCK"}
 	interpreter.exprStmt(&cond)
 	token := interpreter.lexer.Current()
 	interpreter.stmtBlock(&istrue, token)

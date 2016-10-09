@@ -48,3 +48,13 @@ type ForStmt struct {
 type Begin struct {
 	Op string
 }
+
+//IFBlock is the if block
+type IFBlock struct {
+	Op string
+}
+
+//ElseBlock is a else block
+type ElseBlock struct {
+	Op string
+}
