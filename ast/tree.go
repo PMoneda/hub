@@ -68,6 +68,11 @@ func (tree *Tree) RemoveChild(i int) {
 	tree.Children = append(tree.Children[:0], tree.Children[1:]...)
 }
 
+//HasChildren verify if tree has children
+func (tree *Tree) HasChildren() bool {
+	return len(tree.Children) > 0
+}
+
 //ToString prints a tree node
 func (tree *Tree) ToString() string {
 	if tree == nil {

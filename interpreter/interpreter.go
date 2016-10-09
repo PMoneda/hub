@@ -34,6 +34,9 @@ func (interpreter *Interpreter) Run(lexer *lexer.Lexer) {
 		var execRoot ast.Tree
 
 		token := lexer.Next()
+		if lexer.IsBlockDelimiter(token) {
+			token = lexer.Next()
+		}
 		if token == "\\EOF\\" {
 			break
 		}
@@ -189,23 +192,33 @@ func (interpreter *Interpreter) ifStmt(root *ast.Tree) {
 	ifStmt.Op = "if"
 	root.Value = ifStmt
 	var cond ast.Tree
+	var istrue ast.Tree
+	var isElse ast.Tree
+	istrue.Value = "IF_BLOCK"
+	isElse.Value = "ELSE_BLOCK"
 	interpreter.exprStmt(&cond)
 	token := interpreter.lexer.Current()
-	interpreter.stmtBlock(&cond, token)
+	interpreter.stmtBlock(&istrue, token)
 	token = interpreter.lexer.Next()
 	if token == "else" {
 		token = interpreter.lexer.Next()
 		if token == "if" {
 			var right ast.Tree
 			interpreter.ifStmt(&right)
-			cond.AppendChild(&right)
+			isElse.AppendChild(&right)
 		} else {
-			interpreter.stmtBlock(&cond, token)
+			interpreter.stmtBlock(&isElse, token)
 		}
 	} else {
 		interpreter.lexer.GiveTokenBack()
+
 	}
 	root.AppendChild(&cond)
+	root.AppendChild(&istrue)
+	if isElse.HasChildren() {
+		root.AppendChild(&isElse)
+	}
+
 }
 
 func (interpreter *Interpreter) printStmt(root *ast.Tree) {

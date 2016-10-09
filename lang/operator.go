@@ -36,6 +36,12 @@ func (operator Operator) ToString() string {
 
 //HighPriority return if this operator has priority than other
 func (operator Operator) HighPriority(obj Op) bool {
+	if operator.GetSymbol() == "not" {
+		return true
+	}
+	if operator.GetSymbol() == "and" && obj.GetSymbol() == "or" {
+		return true
+	}
 	if obj.GetSymbol() == "**" {
 		return false
 	}

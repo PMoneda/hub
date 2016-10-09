@@ -1,5 +1,11 @@
-var a = 1;
-var b = a + 2;
-var c = b + 3 * 2;
-print c;
-read a;
+var e = 1;
+if a > 2 {
+    print "sim";
+    print "a";
+}else if (a > 1){
+    read a;
+    print 1;
+}else {
+    print b;
+    print c;
+}

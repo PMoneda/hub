@@ -147,7 +147,15 @@ func (lexer *Lexer) IsOperator(c string) bool {
 	switch c {
 	case "<":
 		return true
+	case "<=":
+		return true
+	case ">=":
+		return true
 	case ">":
+		return true
+	case "==":
+		return true
+	case "!=":
 		return true
 	case "=":
 		return true

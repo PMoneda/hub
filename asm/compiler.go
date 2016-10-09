@@ -8,20 +8,29 @@ import (
 
 //OPCODES for hub-lang
 const (
-	CPUSH = "cpush"
-	CPOP  = "cpop"
-	MOV   = "mov"
-	LOAD  = "load"
-	PRINT = "print"
-	SUM   = "sum"
-	MULT  = "mult"
-	DIV   = "div"
-	POW   = "pow"
-	JMP   = "jmp"
-	SUB   = "sub"
-	PUSH  = "push"
-	POP   = "pop"
-	READ  = "read"
+	CPUSH              = "cpush" //Context push
+	CPOP               = "cpop"  //Context pop
+	MOV                = "mov"   //mov op1 op2 Ex: Mov content from op1 to op2
+	LOAD               = "load"  //load $a load new ident on context
+	PRINT              = "print" //print $a Ex: print content of $a on stdio
+	SUM                = "sum"   //sum r0 r1 r0 Ex: execute r0 = r0 + r1
+	MULT               = "mult"  //mult r0 r1 r0 Ex: execute r0 = r0 * r1
+	DIV                = "div"   //div r0 r1 r0 Ex: execute r0 = r0 / r1
+	POW                = "pow"   //pow r0 r1 r0 Ex: execute r0 = r0 ** r1
+	JMP                = "jmp"   //jmp :label Ex: jump to the :label offset
+	JE                 = "je"    //je $a :label Ex: jump to the :label offset if $a == r0
+	JNE                = "jne"   //jne $a :label Ex: jump to the :label offset if $a != r0
+	SUB                = "sub"   //sub r0 r1 r0 Ex: execute r0 = r0 - r1
+	PUSH               = "push"  //push r0 Ex: push content of r0 on stack
+	POP                = "pop"   //pop r0 Ex: pop content from stack and move to r0
+	READ               = "read"  //read $a Ex: read stdin and put result on $a
+	LessThan           = "lt"    //lt $a #2 Ex: execute r0 = $a < 2 (true or false)
+	GreaterThan        = "gt"    //gt $a #2 Ex: execute r0 = $a > 2 (true or false)
+	LessThanOrEqual    = "lte"   //lte $a #2 Ex: execute r0 = $a <= 2 (true or false)
+	GreaterThanOrEqual = "gte"   //gte $a #2 Ex: execute r0 = $a >= 2 (true or false)
+	EQ                 = "eq"    //eq $a #2 Ex: execute r0 = $a == 2 (true or false)
+	DIFF               = "diff"  //diff $a #2 Ex: execute r0 = $a != 2 (true or false)
+	INV                = "inv"   //inv #true r0 Ex: execute r0 = not true
 )
 
 //OpCode represents opcode for hub

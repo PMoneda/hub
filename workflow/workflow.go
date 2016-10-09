@@ -40,8 +40,11 @@ func (workflow *Workflow) Print() *Workflow {
 func (workflow *Workflow) Compile() *Workflow {
 	var begin visitors.BeginVisitor
 	begin.Visit(workflow.inter.GetAst())
-	for _, cmd := range asm.Program {
-		fmt.Println(cmd)
+	for i, cmd := range asm.Program {
+		fmt.Print(fmt.Sprintf("0x%08d", i))
+		fmt.Print("   ")
+		fmt.Print(cmd)
+		fmt.Println()
 	}
 	return workflow
 }

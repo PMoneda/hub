@@ -2,6 +2,7 @@ package visitors
 
 import (
 	"fmt"
+	"strconv"
 
 	"github.com/PMoneda/hub/asm"
 	"github.com/PMoneda/hub/ast"
@@ -32,6 +33,20 @@ func (visitor *StmtVisitor) Visit(node *ast.Tree) {
 		var readStmt asm.ReadCompiler
 		exp := node.Children[0]
 		readStmt.Compile(exp.Value.(lang.Pointer))
+		break
+	case ast.IfStmt:
+
+		var ifStmt asm.IfCompiler
+		size := len(asm.Program)
+		offset := "if_" + strconv.FormatInt(int64(size), 10)
+		ifStmt.Compile(offset, node)
+		exp := node.Children[0]
+		for _, n := range exp.Children {
+			var stmtVisitor StmtVisitor
+			stmtVisitor.Visit(n)
+		}
+		asm.Program.Push(offset + ":")
+
 		break
 	default:
 		fmt.Println(v)
