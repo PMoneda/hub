@@ -1,4 +1,4 @@
-#b interpreter/interpreter.go:184
+#b parser/parser.go:184
 #b ast/tree.go:25
 b asm/expression.go:16
 continue
