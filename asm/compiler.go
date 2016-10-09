@@ -33,11 +33,6 @@ const (
 	INV                = "inv"   //inv #true r0 Ex: execute r0 = not true
 )
 
-//OpCode represents opcode for hub
-type OpCode struct {
-	OpCode string
-}
-
 //Program is a list of commands
 var Program utils.Stack
 
@@ -79,4 +74,23 @@ func PopOp(op1 lang.Object) {
 		op += " " + op1.ToString()
 	}
 	Program.Push(op)
+}
+
+//OpCode represents opcode for hub
+type OpCode interface {
+	ToString() string
+	Execute()
+}
+
+//CPushCode represents opcode cpush
+type CPushCode struct {
+	OpCode string
+	Op1    interface{}
+	Op2    interface{}
+	Op3    interface{}
+}
+
+//ToString print cpush command
+func (opcode CPushCode) ToString() string {
+	return opcode.OpCode
 }

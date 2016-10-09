@@ -78,6 +78,14 @@ func (visitor *StmtVisitor) Visit(node *ast.Tree) {
 		asm.Program.Push(asm.CPOP)
 
 		break
+	case ast.IncStmt:
+		var incStmt asm.IncCompiler
+		incStmt.Compile(node.Children[0].Value.(lang.Pointer))
+		break
+	case ast.DecStmt:
+		var decStmt asm.DecCompiler
+		decStmt.Compile(node.Children[0].Value.(lang.Pointer))
+		break
 	default:
 		fmt.Println(v)
 

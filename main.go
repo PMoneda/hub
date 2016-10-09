@@ -1,4 +1,4 @@
-//Package main is the entry point to Hub Interpreter
+//Package main is the entry point to Hub parser
 package main
 
 import (
@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	test1 = "./interpreter/test/test1.hub"
+	test1 = "./syntax/test/test1.hub"
 )
 
 func main() {

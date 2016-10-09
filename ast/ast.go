@@ -53,3 +53,13 @@ type Begin struct {
 type Block struct {
 	Op string
 }
+
+//IncStmt is a ++ operator
+type IncStmt struct {
+	Op string
+}
+
+//SubStmt is a -- operator
+type DecStmt struct {
+	Op string
+}

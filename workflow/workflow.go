@@ -1,19 +1,19 @@
-// Package workflow controls workflow interpreter
+// Package workflow controls workflow parser
 package workflow
 
 import (
 	"fmt"
 
 	"github.com/PMoneda/hub/asm"
-	"github.com/PMoneda/hub/interpreter"
 	"github.com/PMoneda/hub/lexer"
+	"github.com/PMoneda/hub/syntax"
 	"github.com/PMoneda/hub/visitors"
 )
 
-//Workflow contains information about interpreter
+//Workflow contains information about parser
 type Workflow struct {
 	lex   lexer.Lexer
-	inter interpreter.Interpreter
+	inter syntax.Parser
 }
 
 // Lex starts to process hub file
@@ -25,7 +25,7 @@ func (workflow *Workflow) Lex(fileName string) *Workflow {
 
 // BuildAst create ast from file
 func (workflow *Workflow) BuildAst() *Workflow {
-	workflow.inter = interpreter.Interpreter{}
+	workflow.inter = syntax.Parser{}
 	workflow.inter.Run(&workflow.lex)
 	return workflow
 }

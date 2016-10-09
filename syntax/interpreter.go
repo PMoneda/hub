@@ -1,5 +1,5 @@
 //Package interpreter execute hub commands
-package interpreter
+package syntax
 
 import (
 	"errors"
@@ -12,19 +12,19 @@ import (
 )
 
 //Interpreter instance to run hub code
-type Interpreter struct {
+type Parser struct {
 	lexer          *lexer.Lexer
 	executionState int
 	root           ast.Tree
 }
 
 //GetAst built from file
-func (interpreter *Interpreter) GetAst() *ast.Tree {
+func (interpreter *Parser) GetAst() *ast.Tree {
 	return &interpreter.root
 }
 
 //Run execute a hub script
-func (interpreter *Interpreter) Run(lexer *lexer.Lexer) {
+func (interpreter *Parser) Run(lexer *lexer.Lexer) {
 	interpreter.lexer = lexer
 	interpreter.root = *new(ast.Tree)
 	var begin ast.Begin
@@ -47,12 +47,12 @@ func (interpreter *Interpreter) Run(lexer *lexer.Lexer) {
 }
 
 //Print ast
-func (interpreter *Interpreter) Print() {
+func (interpreter *Parser) Print() {
 	interpreter.print(&interpreter.root)
 }
 
 //Print ast
-func (interpreter *Interpreter) print(root *ast.Tree) {
+func (interpreter *Parser) print(root *ast.Tree) {
 	root.Print(func(value interface{}) {
 		switch v := value.(type) {
 		case lang.Object:
@@ -66,7 +66,7 @@ func (interpreter *Interpreter) print(root *ast.Tree) {
 }
 
 //exec is the initial point of execution and starts with de first token on hub script
-func (interpreter *Interpreter) stmt(parent *ast.Tree, token string) error {
+func (interpreter *Parser) stmt(parent *ast.Tree, token string) error {
 	switch token {
 	case "var":
 		interpreter.varStmt(parent)
@@ -89,11 +89,20 @@ func (interpreter *Interpreter) stmt(parent *ast.Tree, token string) error {
 			token = interpreter.lexer.Next()
 			if token == "++" || token == "--" {
 				var op ast.Tree
-				parent.Value = token
-				op.Value = ident
+				if token == "++" {
+					parent.Value = ast.IncStmt{Op: token}
+				} else {
+					parent.Value = ast.DecStmt{Op: token}
+				}
+				op.Value = interpreter.BuildObject(ident)
 				token = interpreter.lexer.Next()
 				interpreter.matchEndOfCommand(token)
 				parent.AppendChild(&op)
+				return nil
+			} else if token == "=" {
+				interpreter.lexer.GiveTokenBack()
+				interpreter.lexer.GiveTokenBack()
+				interpreter.varStmt(parent)
 				return nil
 			}
 
@@ -102,11 +111,11 @@ func (interpreter *Interpreter) stmt(parent *ast.Tree, token string) error {
 
 	}
 }
-func (interpreter *Interpreter) printExecInfo() {
+func (interpreter *Parser) printExecInfo() {
 	tok := interpreter.lexer.GetTokenInfo()
 	fmt.Printf("error at line %d token %d near %s\n", tok.Line, tok.Index, tok.Value)
 }
-func (interpreter *Interpreter) matchKeyword(next string, keyword string) (string, error) {
+func (interpreter *Parser) matchKeyword(next string, keyword string) (string, error) {
 	if next != keyword {
 		interpreter.printExecInfo()
 		err := errors.New("Expected: " + keyword + " got: " + next)
@@ -116,7 +125,7 @@ func (interpreter *Interpreter) matchKeyword(next string, keyword string) (strin
 	return next, nil //OK
 }
 
-func (interpreter *Interpreter) matchIdent() (string, error) {
+func (interpreter *Parser) matchIdent() (string, error) {
 	next := interpreter.lexer.Next()
 	if !interpreter.lexer.IsIdent(next) {
 		interpreter.printExecInfo()
@@ -125,7 +134,7 @@ func (interpreter *Interpreter) matchIdent() (string, error) {
 	}
 	return next, nil //OK
 }
-func (interpreter *Interpreter) matchEOF(token string) error {
+func (interpreter *Parser) matchEOF(token string) error {
 	if token == "\\EOF\\" {
 		tok := interpreter.lexer.Previous()
 		err := errors.New("Unexpected end of file line: " + string(tok.Line))
@@ -134,7 +143,7 @@ func (interpreter *Interpreter) matchEOF(token string) error {
 	return nil
 }
 
-func (interpreter *Interpreter) matchEndOfCommand(token string) {
+func (interpreter *Parser) matchEndOfCommand(token string) {
 	if token == ";" {
 		return
 	}
@@ -142,7 +151,7 @@ func (interpreter *Interpreter) matchEndOfCommand(token string) {
 	panic("; expected")
 }
 
-func (interpreter *Interpreter) matchEOL(token string) {
+func (interpreter *Parser) matchEOL(token string) {
 	if token == "\n" {
 		return
 	}
@@ -150,7 +159,7 @@ func (interpreter *Interpreter) matchEOL(token string) {
 	panic("End of line expected")
 }
 
-func (interpreter *Interpreter) readStmt(root *ast.Tree) {
+func (interpreter *Parser) readStmt(root *ast.Tree) {
 	var readStmt ast.ReadStmt
 	readStmt.Op = "read"
 	root.Value = readStmt
@@ -160,7 +169,7 @@ func (interpreter *Interpreter) readStmt(root *ast.Tree) {
 	interpreter.matchEndOfCommand(next)
 	root.AppendChild(&idenNode)
 }
-func (interpreter *Interpreter) stmtBlock(root *ast.Tree, token string) {
+func (interpreter *Parser) stmtBlock(root *ast.Tree, token string) {
 	interpreter.matchKeyword("{", token)
 	for token != "}" {
 		var left ast.Tree
@@ -175,7 +184,7 @@ func (interpreter *Interpreter) stmtBlock(root *ast.Tree, token string) {
 	interpreter.matchKeyword("}", token)
 }
 
-func (interpreter *Interpreter) forStmt(root *ast.Tree) {
+func (interpreter *Parser) forStmt(root *ast.Tree) {
 	var forStmt ast.ForStmt
 	forStmt.Op = "for"
 
@@ -194,7 +203,7 @@ func (interpreter *Interpreter) forStmt(root *ast.Tree) {
 	root.AppendChild(&block)
 }
 
-func (interpreter *Interpreter) ifStmt(root *ast.Tree) {
+func (interpreter *Parser) ifStmt(root *ast.Tree) {
 	var ifStmt ast.IfStmt
 	ifStmt.Op = "if"
 	root.Value = ifStmt
@@ -228,7 +237,7 @@ func (interpreter *Interpreter) ifStmt(root *ast.Tree) {
 
 }
 
-func (interpreter *Interpreter) printStmt(root *ast.Tree) {
+func (interpreter *Parser) printStmt(root *ast.Tree) {
 	var printStmt ast.PrintStmt
 	printStmt.Op = "print"
 	root.Value = printStmt
@@ -240,7 +249,7 @@ func (interpreter *Interpreter) printStmt(root *ast.Tree) {
 }
 
 //Statement rule for list of commands
-func (interpreter *Interpreter) varStmt(root *ast.Tree) {
+func (interpreter *Parser) varStmt(root *ast.Tree) {
 	var decl ast.DeclVar
 	var iden ast.Tree
 	var exp ast.Tree
@@ -258,7 +267,7 @@ func (interpreter *Interpreter) varStmt(root *ast.Tree) {
 	root.AppendChild(&iden)
 	root.AppendChild(&exp)
 }
-func (interpreter *Interpreter) identStmt(parent *ast.Tree) {
+func (interpreter *Parser) identStmt(parent *ast.Tree) {
 	id, err := interpreter.matchIdent()
 	if err != nil {
 		panic(err.Error())
@@ -268,13 +277,13 @@ func (interpreter *Interpreter) identStmt(parent *ast.Tree) {
 
 }
 
-func (interpreter *Interpreter) exprStmt(root *ast.Tree) {
+func (interpreter *Parser) exprStmt(root *ast.Tree) {
 
 	interpreter.E(root)
 }
 
 //BuildObject based on token
-func (interpreter *Interpreter) BuildObject(token string) lang.Object {
+func (interpreter *Parser) BuildObject(token string) lang.Object {
 	lex := interpreter.lexer
 	if lex.IsNumber(token) {
 		return lang.BuildNumber(token)
@@ -291,7 +300,7 @@ func (interpreter *Interpreter) BuildObject(token string) lang.Object {
 }
 
 //E reflects a expression rule
-func (interpreter *Interpreter) E(root *ast.Tree) lang.Object {
+func (interpreter *Parser) E(root *ast.Tree) lang.Object {
 	exp := interpreter.convExpToStack()
 	root.Value = exp
 	//evaluate the expression
@@ -299,7 +308,7 @@ func (interpreter *Interpreter) E(root *ast.Tree) lang.Object {
 }
 
 //Converts a expression to stack of operations
-func (interpreter *Interpreter) convExpToStack() utils.Stack {
+func (interpreter *Parser) convExpToStack() utils.Stack {
 	lex := interpreter.lexer
 	token := lex.Next()
 	var terms utils.Stack
