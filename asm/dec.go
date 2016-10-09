@@ -8,7 +8,7 @@ type DecCompiler struct {
 
 //Compile Decrment statement
 func (compiler *DecCompiler) Compile(iden lang.Pointer) {
-	Program.Push(MOV + " $" + iden.ToString() + " r0")
+	LoadOp(iden, "r0")
 	Program.Push(SUB + " #1 r0 r0")
-	Program.Push(MOV + " r0 $" + iden.ToString())
+	LoadFromReg("r0", iden)
 }

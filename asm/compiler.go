@@ -3,15 +3,12 @@ package asm
 
 import (
 	"github.com/PMoneda/hub/lang"
+	"github.com/PMoneda/hub/opcodes"
 	"github.com/PMoneda/hub/utils"
 )
 
 //OPCODES for hub-lang
 const (
-	CPUSH              = "cpush" //Context push
-	CPOP               = "cpop"  //Context pop
-	MOV                = "mov"   //mov op1 op2 Ex: Mov content from op1 to op2
-	LOAD               = "load"  //load $a load new ident on context
 	PRINT              = "print" //print $a Ex: print content of $a on stdio
 	SUM                = "sum"   //sum r0 r1 r0 Ex: execute r0 = r0 + r1
 	MULT               = "mult"  //mult r0 r1 r0 Ex: execute r0 = r0 * r1
@@ -38,15 +35,17 @@ var Program utils.Stack
 
 //LoadOp on register
 func LoadOp(op1 lang.Object, register string) {
-	op := MOV
-	if op1.GetType() == "Pointer" {
-		op += " $" + op1.ToString()
-	} else if op1.GetType() == "Number" {
-		op += " #" + op1.ToString()
-	} else if op1.GetType() == "String" {
-		op += " " + op1.ToString()
-	}
-	op += " " + register
+	op := opcodes.Mov{}
+	op.From = op1
+	op.To = register
+	Program.Push(op)
+}
+
+//LoadFromReg ident from reg
+func LoadFromReg(register string, op1 lang.Object) {
+	op := opcodes.Mov{}
+	op.From = register
+	op.To = op1
 	Program.Push(op)
 }
 
@@ -74,23 +73,4 @@ func PopOp(op1 lang.Object) {
 		op += " " + op1.ToString()
 	}
 	Program.Push(op)
-}
-
-//OpCode represents opcode for hub
-type OpCode interface {
-	ToString() string
-	Execute()
-}
-
-//CPushCode represents opcode cpush
-type CPushCode struct {
-	OpCode string
-	Op1    interface{}
-	Op2    interface{}
-	Op3    interface{}
-}
-
-//ToString print cpush command
-func (opcode CPushCode) ToString() string {
-	return opcode.OpCode
 }

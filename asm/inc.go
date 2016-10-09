@@ -8,7 +8,7 @@ type IncCompiler struct {
 
 //Compile Increment statement
 func (compiler *IncCompiler) Compile(iden lang.Pointer) {
-	Program.Push(MOV + " $" + iden.ToString() + " r0")
+	LoadOp(iden, "r0")
 	Program.Push(SUM + " #1 r0 r0")
-	Program.Push(MOV + " r0 $" + iden.ToString())
+	LoadFromReg("r0", iden)
 }

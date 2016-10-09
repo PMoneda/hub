@@ -7,6 +7,7 @@ import (
 	"github.com/PMoneda/hub/asm"
 	"github.com/PMoneda/hub/ast"
 	"github.com/PMoneda/hub/lang"
+	"github.com/PMoneda/hub/opcodes"
 	"github.com/PMoneda/hub/utils"
 )
 
@@ -43,9 +44,9 @@ func (visitor *StmtVisitor) Visit(node *ast.Tree) {
 		ifStmt.Compile(offset, elseOffset, node)
 		ifBlock := node.Children[1]
 		var stmtVisitor StmtVisitor
-		asm.Program.Push(asm.CPUSH)
+		asm.Program.Push(opcodes.CPush{})
 		stmtVisitor.Visit(ifBlock.Children[0])
-		asm.Program.Push(asm.CPOP)
+		asm.Program.Push(opcodes.CPop{})
 		asm.Program.Push(asm.JMP + " :" + offset)
 		if len(node.Children) == 3 {
 			//has else block
@@ -68,14 +69,14 @@ func (visitor *StmtVisitor) Visit(node *ast.Tree) {
 		exitOffset := "exit_for_" + strconv.FormatInt(int64(size), 10)
 		exp := node.Children[0]
 		block := node.Children[1]
-		asm.Program.Push(asm.CPUSH)
+		asm.Program.Push(opcodes.CPush{})
 		forStmt.Compile(offset, expOffset, exitOffset, exp)
 		var stmtVisitor StmtVisitor
 		asm.Program.Push(offset + ":")
 		stmtVisitor.Visit(block.Children[0])
 		asm.Program.Push(asm.JMP + " :" + expOffset)
 		asm.Program.Push(exitOffset + ":")
-		asm.Program.Push(asm.CPOP)
+		asm.Program.Push(opcodes.CPop{})
 
 		break
 	case ast.IncStmt:

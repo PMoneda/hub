@@ -6,6 +6,7 @@ import (
 
 	"github.com/PMoneda/hub/asm"
 	"github.com/PMoneda/hub/lexer"
+	"github.com/PMoneda/hub/opcodes"
 	"github.com/PMoneda/hub/syntax"
 	"github.com/PMoneda/hub/visitors"
 )
@@ -43,7 +44,14 @@ func (workflow *Workflow) Compile() *Workflow {
 	for i, cmd := range asm.Program {
 		fmt.Print(fmt.Sprintf("0x%08d", i))
 		fmt.Print("   ")
-		fmt.Print(cmd)
+		switch v := cmd.(type) {
+		case opcodes.OpCode:
+			fmt.Print(v.ToString())
+			break
+		default:
+			fmt.Print(v)
+			break
+		}
 		fmt.Println()
 	}
 	return workflow
