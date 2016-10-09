@@ -35,20 +35,37 @@ func (visitor *StmtVisitor) Visit(node *ast.Tree) {
 		readStmt.Compile(exp.Value.(lang.Pointer))
 		break
 	case ast.IfStmt:
-
 		var ifStmt asm.IfCompiler
 		size := len(asm.Program)
 		offset := "if_" + strconv.FormatInt(int64(size), 10)
-		ifStmt.Compile(offset, node)
-		exp := node.Children[0]
-		for _, n := range exp.Children {
-			var stmtVisitor StmtVisitor
-			stmtVisitor.Visit(n)
+		elseOffset := "else_" + strconv.FormatInt(int64(size), 10)
+		//Compile if condition
+		ifStmt.Compile(offset, elseOffset, node)
+		ifBlock := node.Children[1]
+		var stmtVisitor StmtVisitor
+		stmtVisitor.Visit(ifBlock.Children[0])
+		asm.Program.Push(asm.JMP + " :" + offset)
+		if len(node.Children) == 3 {
+			//has else block
+			elseBlock := node.Children[2]
+			asm.Program.Push(elseOffset + ":")
+			stmtVisitor.Visit(elseBlock)
+			asm.Program.Push(asm.JMP + " :" + offset)
+			asm.Program.Push(offset + ":")
+		} else {
+			asm.Program.Push(offset + ":")
 		}
-		asm.Program.Push(offset + ":")
-
+		break
+	case ast.ElseBlock:
+		var stmtVisitor StmtVisitor
+		stmtVisitor.Visit(node.Children[0])
+		break
+	case ast.IFBlock:
+		var stmtVisitor StmtVisitor
+		stmtVisitor.Visit(node.Children[0])
 		break
 	default:
 		fmt.Println(v)
+
 	}
 }

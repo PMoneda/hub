@@ -1,11 +1,10 @@
-var e = 1;
+
 if a > 2 {
     print "sim";
     print "a";
-}else if (a > 1){
-    read a;
-    print 1;
-}else {
-    print b;
-    print c;
+} else if 3 < 10 {
+    print "b";
+}else{
+   var a = 1+2;
 }
+print e;
