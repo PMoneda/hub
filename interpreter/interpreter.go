@@ -178,13 +178,20 @@ func (interpreter *Interpreter) stmtBlock(root *ast.Tree, token string) {
 func (interpreter *Interpreter) forStmt(root *ast.Tree) {
 	var forStmt ast.ForStmt
 	forStmt.Op = "for"
+
+	var blockStmt ast.Block
+	blockStmt.Op = "BLOCK_FOR"
+	var block ast.Tree
+
+	block.Value = blockStmt
+
 	root.Value = forStmt
-	//var right ast.Tree
 	var cond ast.Tree
 	interpreter.exprStmt(&cond)
 	token := interpreter.lexer.Current()
-	interpreter.stmtBlock(&cond, token)
+	interpreter.stmtBlock(&block, token)
 	root.AppendChild(&cond)
+	root.AppendChild(&block)
 }
 
 func (interpreter *Interpreter) ifStmt(root *ast.Tree) {
@@ -194,8 +201,8 @@ func (interpreter *Interpreter) ifStmt(root *ast.Tree) {
 	var cond ast.Tree
 	var istrue ast.Tree
 	var isElse ast.Tree
-	istrue.Value = ast.IFBlock{Op: "IF_BLOCK"}
-	isElse.Value = ast.ElseBlock{Op: "ELSE_BLOCK"}
+	istrue.Value = ast.Block{Op: "IF_BLOCK"}
+	isElse.Value = ast.Block{Op: "ELSE_BLOCK"}
 	interpreter.exprStmt(&cond)
 	token := interpreter.lexer.Current()
 	interpreter.stmtBlock(&istrue, token)

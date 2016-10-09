@@ -43,7 +43,9 @@ func (visitor *StmtVisitor) Visit(node *ast.Tree) {
 		ifStmt.Compile(offset, elseOffset, node)
 		ifBlock := node.Children[1]
 		var stmtVisitor StmtVisitor
+		asm.Program.Push(asm.CPUSH)
 		stmtVisitor.Visit(ifBlock.Children[0])
+		asm.Program.Push(asm.CPOP)
 		asm.Program.Push(asm.JMP + " :" + offset)
 		if len(node.Children) == 3 {
 			//has else block
@@ -51,18 +53,30 @@ func (visitor *StmtVisitor) Visit(node *ast.Tree) {
 			asm.Program.Push(elseOffset + ":")
 			stmtVisitor.Visit(elseBlock)
 			asm.Program.Push(asm.JMP + " :" + offset)
-			asm.Program.Push(offset + ":")
-		} else {
-			asm.Program.Push(offset + ":")
 		}
+		asm.Program.Push(offset + ":")
 		break
-	case ast.ElseBlock:
+	case ast.Block:
 		var stmtVisitor StmtVisitor
 		stmtVisitor.Visit(node.Children[0])
 		break
-	case ast.IFBlock:
+	case ast.ForStmt:
+		var forStmt asm.LoopCompiler
+		size := len(asm.Program)
+		offset := "for_block_" + strconv.FormatInt(int64(size), 10)
+		expOffset := "for_" + strconv.FormatInt(int64(size), 10)
+		exitOffset := "exit_for_" + strconv.FormatInt(int64(size), 10)
+		exp := node.Children[0]
+		block := node.Children[1]
+		asm.Program.Push(asm.CPUSH)
+		forStmt.Compile(offset, expOffset, exitOffset, exp)
 		var stmtVisitor StmtVisitor
-		stmtVisitor.Visit(node.Children[0])
+		asm.Program.Push(offset + ":")
+		stmtVisitor.Visit(block.Children[0])
+		asm.Program.Push(asm.JMP + " :" + expOffset)
+		asm.Program.Push(exitOffset + ":")
+		asm.Program.Push(asm.CPOP)
+
 		break
 	default:
 		fmt.Println(v)

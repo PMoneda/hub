@@ -49,12 +49,7 @@ type Begin struct {
 	Op string
 }
 
-//IFBlock is the if block
-type IFBlock struct {
-	Op string
-}
-
-//ElseBlock is a else block
-type ElseBlock struct {
+//Block is a block of code
+type Block struct {
 	Op string
 }
