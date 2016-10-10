@@ -17,13 +17,12 @@ func (exp *ExpCompiler) Compile(expr utils.Stack) {
 		case lang.Operator:
 			if v.GetSymbol() == "not" {
 				Program.Push(opcodes.Pop{Op: "r0"})
-				Program.Push(INV + " r0 r0")
+				Program.Push(opcodes.Inv{Op1: "r0", Result: "r0"})
 				Program.Push(opcodes.Push{Op: "r0"})
 				break
 			}
 			Program.Push(opcodes.Pop{Op: "r0"})
 			Program.Push(opcodes.Pop{Op: "r1"})
-			assign := " r0 r1 r0"
 			if v.GetSymbol() == "+" {
 				Program.Push(opcodes.Sum{Op1: "r0", Op2: "r1", Result: "r0"})
 			} else if v.GetSymbol() == "*" {
@@ -35,17 +34,18 @@ func (exp *ExpCompiler) Compile(expr utils.Stack) {
 			} else if v.GetSymbol() == "-" {
 				Program.Push(opcodes.Sub{Op1: "r0", Op2: "r1", Result: "r0"})
 			} else if v.GetSymbol() == ">" {
-				Program.Push(GreaterThan + " r1 r0 r0")
+				Program.Push(opcodes.Gt{Op1: "r1", Op2: "r0", Result: "r0"})
 			} else if v.GetSymbol() == ">=" {
-				Program.Push(GreaterThanOrEqual + " r1 r0 r0")
+				Program.Push(opcodes.Gte{Op1: "r1", Op2: "r0", Result: "r0"})
+
 			} else if v.GetSymbol() == "<" {
-				Program.Push(LessThan + " r1 r0 r0")
+				Program.Push(opcodes.Lt{Op1: "r1", Op2: "r0", Result: "r0"})
 			} else if v.GetSymbol() == "<=" {
-				Program.Push(LessThanOrEqual + " r1 r0 r0")
+				Program.Push(opcodes.Lte{Op1: "r1", Op2: "r0", Result: "r0"})
 			} else if v.GetSymbol() == "==" {
-				Program.Push(EQ + assign)
+				Program.Push(opcodes.Eq{Op1: "r1", Op2: "r0", Result: "r0"})
 			} else if v.GetSymbol() == "!=" {
-				Program.Push(GreaterThan + assign)
+				Program.Push(opcodes.Diff{Op1: "r1", Op2: "r0", Result: "r0"})
 			}
 			Program.Push(opcodes.Push{Op: "r0"})
 			break

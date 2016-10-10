@@ -23,5 +23,5 @@ type ReadCompiler struct {
 
 //Compile print statement
 func (compiler *ReadCompiler) Compile(ident lang.Pointer) {
-	Program.Push(READ + " " + ident.ToString())
+	Program.Push(opcodes.Read{Op: "r0"})
 }

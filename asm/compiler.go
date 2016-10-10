@@ -7,18 +7,6 @@ import (
 	"github.com/PMoneda/hub/utils"
 )
 
-//OPCODES for hub-lang
-const (
-	READ               = "read" //read $a Ex: read stdin and put result on $a
-	LessThan           = "lt"   //lt $a #2 Ex: execute r0 = $a < 2 (true or false)
-	GreaterThan        = "gt"   //gt $a #2 Ex: execute r0 = $a > 2 (true or false)
-	LessThanOrEqual    = "lte"  //lte $a #2 Ex: execute r0 = $a <= 2 (true or false)
-	GreaterThanOrEqual = "gte"  //gte $a #2 Ex: execute r0 = $a >= 2 (true or false)
-	EQ                 = "eq"   //eq $a #2 Ex: execute r0 = $a == 2 (true or false)
-	DIFF               = "diff" //diff $a #2 Ex: execute r0 = $a != 2 (true or false)
-	INV                = "inv"  //inv #true r0 Ex: execute r0 = not true
-)
-
 //Program is a list of commands
 var Program utils.Stack
 
