@@ -42,6 +42,7 @@ func (visitor *StmtVisitor) Visit(node *ast.Tree) {
 		elseOffset := "else_" + strconv.FormatInt(int64(size), 10)
 		//Compile if condition
 		ifStmt.Compile(offset, elseOffset, node)
+
 		ifBlock := node.Children[1]
 		var stmtVisitor StmtVisitor
 		asm.Program.Push(opcodes.CPush{})

@@ -2,6 +2,7 @@ package opcodes
 
 import (
 	"fmt"
+	"strconv"
 
 	"github.com/PMoneda/hub/lang"
 )
@@ -33,4 +34,14 @@ func (opcode Jne) ToString() string {
 //Execute execute Jne command
 func (opcode Jne) Execute() {
 	fmt.Println("Execute Jne")
+}
+
+//SetOffset execute Je command
+func (opcode *Jne) SetOffset(offsets map[string]int) {
+	addr1 := offsets[opcode.Label]
+	opcode.setOffset(addr1)
+}
+
+func (opcode *Jne) setOffset(addr int) {
+	opcode.Label = strconv.FormatInt(int64(addr), 10)
 }

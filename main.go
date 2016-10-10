@@ -10,5 +10,5 @@ const (
 func main() {
 	var flow workflow.Workflow
 	//flow.Lex(test1).BuildAst().Print().Compile().PrintAsm()
-	flow.Lex(test1).BuildAst().Compile().PrintAsm()
+	flow.Lex(test1).BuildAst().Compile().TranslateOffsets().PrintAsm()
 }

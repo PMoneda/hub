@@ -44,9 +44,26 @@ func (workflow *Workflow) Compile() *Workflow {
 	return workflow
 }
 
+// TranslateOffsets from asm codes
+func (workflow *Workflow) TranslateOffsets() *Workflow {
+	code := asm.Program.GetStack()
+	offsets := asm.Program.TranslateOffset()
+	for i := 0; i < len(offsets); i++ {
+		addr := offsets[i]
+		opcode := (*code)[addr].(opcodes.FlowControl)
+		op := opcode
+		fmt.Println(opcode)
+		op.SetOffset(asm.Program.OffsetMap())
+	}
+
+	return workflow
+}
+
 //PrintAsm of hub code
 func (workflow *Workflow) PrintAsm() *Workflow {
-	for i, cmd := range asm.Program.GetStack() {
+	list := *asm.Program.GetStack()
+	for i := 0; i < len(list); i++ {
+		cmd := list[i]
 		fmt.Print(fmt.Sprintf("0x%08d", i))
 		fmt.Print("   ")
 		switch v := cmd.(type) {

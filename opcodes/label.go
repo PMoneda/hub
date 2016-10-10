@@ -4,7 +4,8 @@ import "fmt"
 
 //Label is the offset opcode
 type Label struct {
-	Label string
+	Label  string
+	Offset int
 }
 
 //ToString prints label opcode

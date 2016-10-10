@@ -9,11 +9,29 @@ import (
 
 //Assembler is the assembler process context
 type Assembler struct {
-	stack utils.Stack
+	stack             utils.Stack
+	offsetMap         map[string]int
+	toTranslateOffset []int
 }
 
 //Push OpCode to the program
-func (asm *Assembler) Push(op opcodes.OpCode) {
+func (asm *Assembler) Push(op interface{}) {
+	switch v := op.(type) {
+	case opcodes.Label:
+		if asm.offsetMap == nil {
+			asm.offsetMap = make(map[string]int)
+		}
+		offset := asm.Len() + 1
+		asm.offsetMap[v.Label] = offset
+
+		break
+	case *opcodes.FlowControl:
+		if asm.toTranslateOffset == nil {
+			asm.toTranslateOffset = make([]int, 0)
+		}
+		asm.toTranslateOffset = append(asm.toTranslateOffset, len(asm.stack))
+		break
+	}
 	asm.stack.Push(op)
 }
 
@@ -22,9 +40,19 @@ func (asm *Assembler) Len() int {
 	return len(asm.stack)
 }
 
+//OffsetMap of labels
+func (asm *Assembler) OffsetMap() map[string]int {
+	return asm.offsetMap
+}
+
+//TranslateOffset of labels
+func (asm *Assembler) TranslateOffset() []int {
+	return asm.toTranslateOffset
+}
+
 //GetStack of Program
-func (asm *Assembler) GetStack() utils.Stack {
-	return asm.stack
+func (asm *Assembler) GetStack() *utils.Stack {
+	return &asm.stack
 }
 
 //Program is a Global Assembler object
