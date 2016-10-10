@@ -22,7 +22,7 @@ func (opcode Jmp) Execute() {
 }
 
 //SetOffset execute Je command
-func (opcode *Jmp) SetOffset(offsets map[string]int) {
+func (opcode Jmp) SetOffset(offsets map[string]int) {
 	addr1 := offsets[opcode.Label]
 	opcode.setOffset(addr1)
 

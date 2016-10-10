@@ -48,14 +48,12 @@ func (workflow *Workflow) Compile() *Workflow {
 func (workflow *Workflow) TranslateOffsets() *Workflow {
 	code := asm.Program.GetStack()
 	offsets := asm.Program.TranslateOffset()
+	fmt.Println(offsets)
 	for i := 0; i < len(offsets); i++ {
 		addr := offsets[i]
 		opcode := (*code)[addr].(opcodes.FlowControl)
-		op := opcode
-		fmt.Println(opcode)
-		op.SetOffset(asm.Program.OffsetMap())
+		opcode.SetOffset(asm.Program.OffsetMap())
 	}
-
 	return workflow
 }
 

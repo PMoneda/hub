@@ -23,9 +23,8 @@ func (asm *Assembler) Push(op interface{}) {
 		}
 		offset := asm.Len() + 1
 		asm.offsetMap[v.Label] = offset
-
 		break
-	case *opcodes.FlowControl:
+	case opcodes.FlowControl:
 		if asm.toTranslateOffset == nil {
 			asm.toTranslateOffset = make([]int, 0)
 		}

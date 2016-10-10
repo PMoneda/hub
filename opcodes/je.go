@@ -38,7 +38,7 @@ func (opcode Je) Execute() {
 }
 
 //SetOffset execute Je command
-func (opcode *Je) SetOffset(offsets map[string]int) {
+func (opcode Je) SetOffset(offsets map[string]int) {
 	addr1 := offsets[opcode.LabelOk]
 	addr2 := offsets[opcode.LabelNOk]
 	opcode.setOffset(addr1, addr2)
