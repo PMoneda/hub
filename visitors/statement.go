@@ -37,7 +37,7 @@ func (visitor *StmtVisitor) Visit(node *ast.Tree) {
 		break
 	case ast.IfStmt:
 		var ifStmt asm.IfCompiler
-		size := len(asm.Program)
+		size := asm.Program.Len()
 		offset := "if_" + strconv.FormatInt(int64(size), 10)
 		elseOffset := "else_" + strconv.FormatInt(int64(size), 10)
 		//Compile if condition
@@ -64,7 +64,7 @@ func (visitor *StmtVisitor) Visit(node *ast.Tree) {
 		break
 	case ast.ForStmt:
 		var forStmt asm.LoopCompiler
-		size := len(asm.Program)
+		size := asm.Program.Len()
 		offset := "for_block_" + strconv.FormatInt(int64(size), 10)
 		expOffset := "for_" + strconv.FormatInt(int64(size), 10)
 		exitOffset := "exit_for_" + strconv.FormatInt(int64(size), 10)
