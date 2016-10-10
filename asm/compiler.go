@@ -13,7 +13,7 @@ type Assembler struct {
 }
 
 //Push OpCode to the program
-func (asm *Assembler) Push(op interface{}) {
+func (asm *Assembler) Push(op opcodes.OpCode) {
 	asm.stack.Push(op)
 }
 

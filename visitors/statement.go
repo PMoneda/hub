@@ -52,11 +52,11 @@ func (visitor *StmtVisitor) Visit(node *ast.Tree) {
 		if len(node.Children) == 3 {
 			//has else block
 			elseBlock := node.Children[2]
-			asm.Program.Push(elseOffset + ":")
+			asm.Program.Push(opcodes.Label{Label: elseOffset})
 			stmtVisitor.Visit(elseBlock)
 			asm.Program.Push(opcodes.Jmp{Label: offset})
 		}
-		asm.Program.Push(offset + ":")
+		asm.Program.Push(opcodes.Label{Label: offset})
 		break
 	case ast.Block:
 		var stmtVisitor StmtVisitor
@@ -73,10 +73,10 @@ func (visitor *StmtVisitor) Visit(node *ast.Tree) {
 		asm.Program.Push(opcodes.CPush{})
 		forStmt.Compile(offset, expOffset, exitOffset, exp)
 		var stmtVisitor StmtVisitor
-		asm.Program.Push(offset + ":")
+		asm.Program.Push(opcodes.Label{Label: offset})
 		stmtVisitor.Visit(block.Children[0])
 		asm.Program.Push(opcodes.Jmp{Label: offset})
-		asm.Program.Push(exitOffset + ":")
+		asm.Program.Push(opcodes.Label{Label: exitOffset})
 		asm.Program.Push(opcodes.CPop{})
 
 		break
