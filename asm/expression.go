@@ -2,6 +2,7 @@ package asm
 
 import (
 	"github.com/PMoneda/hub/lang"
+	"github.com/PMoneda/hub/opcodes"
 	"github.com/PMoneda/hub/utils"
 )
 
@@ -15,22 +16,24 @@ func (exp *ExpCompiler) Compile(expr utils.Stack) {
 		switch v := op.(type) {
 		case lang.Operator:
 			if v.GetSymbol() == "not" {
-				Program.Push(POP + " r0")
+				Program.Push(opcodes.Pop{Op: "r0"})
 				Program.Push(INV + " r0 r0")
-				Program.Push(PUSH + " r0")
+				Program.Push(opcodes.Push{Op: "r0"})
 				break
 			}
-			Program.Push(POP + " r0")
-			Program.Push(POP + " r1")
+			Program.Push(opcodes.Pop{Op: "r0"})
+			Program.Push(opcodes.Pop{Op: "r1"})
 			assign := " r0 r1 r0"
 			if v.GetSymbol() == "+" {
-				Program.Push(SUM + assign)
+				Program.Push(opcodes.Sum{Op1: "r0", Op2: "r1", Result: "r0"})
 			} else if v.GetSymbol() == "*" {
-				Program.Push(MULT + assign)
+				Program.Push(opcodes.Mult{Op1: "r0", Op2: "r1", Result: "r0"})
 			} else if v.GetSymbol() == "/" {
-				Program.Push(DIV + assign)
+				Program.Push(opcodes.Div{Op1: "r0", Op2: "r1", Result: "r0"})
+			} else if v.GetSymbol() == "**" {
+				Program.Push(opcodes.Pow{Op1: "r0", Op2: "r1", Result: "r0"})
 			} else if v.GetSymbol() == "-" {
-				Program.Push(SUB + assign)
+				Program.Push(opcodes.Sub{Op1: "r0", Op2: "r1", Result: "r0"})
 			} else if v.GetSymbol() == ">" {
 				Program.Push(GreaterThan + " r1 r0 r0")
 			} else if v.GetSymbol() == ">=" {
@@ -44,13 +47,13 @@ func (exp *ExpCompiler) Compile(expr utils.Stack) {
 			} else if v.GetSymbol() == "!=" {
 				Program.Push(GreaterThan + assign)
 			}
-			Program.Push(PUSH + " r0")
+			Program.Push(opcodes.Push{Op: "r0"})
 			break
 		case lang.Object:
 			PushOp(v)
 			break
 		}
 	}
-	Program.Push(POP + " r0")
+	Program.Push(opcodes.Pop{Op: "r0"})
 
 }

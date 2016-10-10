@@ -47,13 +47,14 @@ func (visitor *StmtVisitor) Visit(node *ast.Tree) {
 		asm.Program.Push(opcodes.CPush{})
 		stmtVisitor.Visit(ifBlock.Children[0])
 		asm.Program.Push(opcodes.CPop{})
-		asm.Program.Push(asm.JMP + " :" + offset)
+		asm.Program.Push(opcodes.Jmp{Label: offset})
+
 		if len(node.Children) == 3 {
 			//has else block
 			elseBlock := node.Children[2]
 			asm.Program.Push(elseOffset + ":")
 			stmtVisitor.Visit(elseBlock)
-			asm.Program.Push(asm.JMP + " :" + offset)
+			asm.Program.Push(opcodes.Jmp{Label: offset})
 		}
 		asm.Program.Push(offset + ":")
 		break
@@ -74,7 +75,7 @@ func (visitor *StmtVisitor) Visit(node *ast.Tree) {
 		var stmtVisitor StmtVisitor
 		asm.Program.Push(offset + ":")
 		stmtVisitor.Visit(block.Children[0])
-		asm.Program.Push(asm.JMP + " :" + expOffset)
+		asm.Program.Push(opcodes.Jmp{Label: offset})
 		asm.Program.Push(exitOffset + ":")
 		asm.Program.Push(opcodes.CPop{})
 

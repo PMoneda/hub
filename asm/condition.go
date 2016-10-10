@@ -2,6 +2,7 @@ package asm
 
 import (
 	"github.com/PMoneda/hub/ast"
+	"github.com/PMoneda/hub/opcodes"
 	"github.com/PMoneda/hub/utils"
 )
 
@@ -15,9 +16,9 @@ func (compiler *IfCompiler) Compile(offset string, elseOffset string, node *ast.
 	var cmp ExpCompiler
 	cmp.Compile(exp.Value.(utils.Stack))
 	if len(node.Children) == 3 {
-		Program.Push(JNE + " #true :" + elseOffset)
+		Program.Push(opcodes.Jne{Compare: true, Label: elseOffset})
 	} else {
-		Program.Push(JNE + " #true :" + offset)
+		Program.Push(opcodes.Jne{Compare: true, Label: offset})
 	}
 
 }

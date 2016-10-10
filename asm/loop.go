@@ -2,6 +2,7 @@ package asm
 
 import (
 	"github.com/PMoneda/hub/ast"
+	"github.com/PMoneda/hub/opcodes"
 	"github.com/PMoneda/hub/utils"
 )
 
@@ -15,6 +16,6 @@ func (compiler *LoopCompiler) Compile(offset string, expOffset string, exitOffse
 	var cmp ExpCompiler
 	Program.Push(expOffset + ":")
 	cmp.Compile(node.Value.(utils.Stack))
-	Program.Push(JE + " #true :" + offset + " :" + exitOffset)
+	Program.Push(opcodes.Je{Compare: true, LabelOk: offset, LabelNOk: exitOffset})
 
 }

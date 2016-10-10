@@ -2,6 +2,7 @@ package asm
 
 import (
 	"github.com/PMoneda/hub/lang"
+	"github.com/PMoneda/hub/opcodes"
 	"github.com/PMoneda/hub/utils"
 )
 
@@ -13,7 +14,7 @@ type PrintCompiler struct {
 func (compiler *PrintCompiler) Compile(expr utils.Stack) {
 	var exp ExpCompiler
 	exp.Compile(expr)
-	Program.Push(PRINT + " r0")
+	Program.Push(opcodes.Print{Op: "r0"})
 }
 
 //ReadCompiler generate print instruction
